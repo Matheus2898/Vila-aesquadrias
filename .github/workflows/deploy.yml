@@ -20,6 +20,7 @@ jobs:
 
     - name: 🔨 Instalar dependências e criar Build
       run: |
+        cd Site-vidralpha
         npm install
         npm run build
 
@@ -29,5 +30,5 @@ jobs:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./dist/
+        local-dir: ./Site-vidralpha/dist/
         server-dir: /public_html/
