@@ -24,6 +24,11 @@ export default function MegaMenu() {
 
       const validLines = linesData ? linesData.map(l => l.name) : [];
 
+      const normalizeCategory = (cat) => {
+        if (!cat) return '';
+        return cat.trim().toLowerCase().replace(/(^\w|\s\w)/g, m => m.toUpperCase());
+      };
+
       // 2. Busca categorias da tabela item_costs
       const { data: costData } = await supabase
         .from('item_costs')
@@ -31,8 +36,10 @@ export default function MegaMenu() {
         .not('category', 'is', null);
 
       if (costData) {
-        // Filtra para manter somente as linhas válidas
-        const filteredCostData = costData.filter(r => validLines.includes(r.line));
+        // Filtra para manter somente as linhas válidas e normaliza as categorias
+        const filteredCostData = costData
+          .filter(r => validLines.includes(r.line))
+          .map(r => ({ ...r, category: normalizeCategory(r.category) }));
 
         // Pega as categorias únicas, filtra, ordena e limita a 10
         const uniqueCategories = Array.from(new Set(filteredCostData.map(r => r.category)))
@@ -65,7 +72,7 @@ export default function MegaMenu() {
         .order('created_at', { ascending: false });
 
       if (productData) {
-        setProducts(productData);
+        setProducts(productData.map(p => ({ ...p, category: normalizeCategory(p.category) })));
       }
     };
 
