@@ -1,0 +1,33 @@
+name: Deploy Automático via FTP
+
+on:
+  push:
+    branches:
+      - main # ou master, dependendo de como está o nome da sua branch principal
+
+jobs:
+  web-deploy:
+    name: 🎉 Publicar Site
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚚 Obter o código atualizado
+      uses: actions/checkout@v4
+
+    - name: 📦 Configurar Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: 🔨 Instalar dependências e criar Build
+      run: |
+        npm install
+        npm run build
+
+    - name: 📂 Enviar para o servidor (FTP)
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./dist/
+        server-dir: /public_html/

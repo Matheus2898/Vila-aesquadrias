@@ -1,0 +1,14 @@
+{
+  "quotes": [
+    {
+      "price": "16.28",
+      "time": "Receba Hoje em até 2 horas",
+      "vehicle": "Carro de Passeio (Até 300kg)"
+    },
+    {
+      "price": "59.52",
+      "time": "Receba Hoje em até 2 horas",
+      "vehicle": "Van Utilitária"
+    }
+  ]
+}

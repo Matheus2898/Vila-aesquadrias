@@ -1,0 +1,12 @@
+{
+  "name": "vidralpha",
+  "version": "1.0.0",
+  "description": "Vidralpha — Design System e site premium",
+  "scripts": {
+    "dev": "vite \"Design system\" --open",
+    "preview": "vite preview \"Design system\""
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

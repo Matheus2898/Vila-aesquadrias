@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vidralpha — Design System Styleguide v1.0</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Inter:wght@400;700&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="tokens.css" />
+  <style>
+    /* ─── BASE ─────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+
+    body {
+      font-family: var(--font-body);
+      background: white;
+      color: #111118;
+      min-height: 100vh;
+    }
+
+    /* Grid paper background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(26,30,76,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26,30,76,0.05) 1px, transparent 1px);
+      background-size: 24px 24px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── LAYOUT ─────────────────────────────── */
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 60px 48px 100px;
+    }
+
+    /* ─── PAGE HEADER ─────────────────────────── */
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 52px;
+      padding-bottom: 24px;
+      border-bottom: 2px solid #111118;
+    }
+    .page-title {
+      font-family: var(--font-display);
+      font-size: 64px;
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      color: #111118;
+    }
+    .page-meta {
+      text-align: right;
+    }
+    .page-logo {
+      font-family: var(--font-logo);
+      font-size: 44px;
+      font-weight: 700;
+      color: #fcec12;
+      text-shadow: 2px 2px 0px #000;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+    .page-version {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #888;
+      display: block;
+    }
+
+    /* ─── SECTION ─────────────────────────────── */
+    .ds-section {
+      margin-bottom: 56px;
+    }
+    .ds-section-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      color: #111118;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+      padding-bottom: 10px;
+      border-bottom: 1.5px solid #D0D0C8;
+    }
+    .ds-row {
+      display: flex;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .ds-col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .ds-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #888;
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── TWO COLUMNS ─────────────────────────── */
+    .ds-two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      margin-top: 48px;
+    }
+
+    /* ─── COLOR TOKENS ────────────────────────── */
+    .color-swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .swatch-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.10);
+    }
+    .swatch-ring {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 3px solid #1A1E4C;
+      background: transparent;
+    }
+    .swatch-hex {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: #555;
+      text-align: center;
+    }
+    .swatch-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: #333;
+      text-align: center;
+    }
+
+    /* ─── TYPOGRAPHY SCALE ────────────────────── */
+    .type-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .type-row + .type-row { margin-top: 6px; }
+
+    .t-display { font-family: var(--font-display); font-size: 40px; font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; color: #111118; }
+    .t-h1      { font-family: var(--font-display); font-size: 32px; font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; color: #111118; }
+    .t-h2      { font-family: var(--font-display); font-size: 24px; font-weight: 700; line-height: 1.2; color: #111118; }
+    .t-subtitle{ font-family: var(--font-body);    font-size: 18px; font-weight: 500; color: #333; }
+    .t-body1   { font-family: var(--font-body);    font-size: 16px; font-weight: 400; color: #444; }
+    .t-body2   { font-family: var(--font-body);    font-size: 14px; font-weight: 400; color: #555; }
+    .t-caption { font-family: var(--font-body);    font-size: 12px; color: #777; }
+    .t-button  { font-family: var(--font-body);    font-size: 14px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #111; }
+    .t-mono    { font-family: var(--font-mono);    font-size: 13px; color: #555; }
+    .t-logo    { 
+      font-family: var(--font-logo); 
+      font-size: 44px; 
+      font-weight: 700; 
+      color: #fcec12;
+      text-shadow: 2px 2px 0 #000;
+      display: inline-block;
+    }
+
+    .type-meta {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: #AAA;
+    }
+
+    /* ─── SPACING ─────────────────────────────── */
+    .spacing-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .spacing-box-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .spacing-arrows {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .spacing-box {
+      background: rgba(26,30,76,0.08);
+      border: 1.5px solid rgba(26,30,76,0.25);
+      flex-shrink: 0;
+    }
+
+    /* ─── RADIUS ──────────────────────────────── */
+    .radius-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .radius-box {
+      width: 72px;
+      height: 72px;
+      background: white;
+      border: 2px solid #1A1E4C;
+    }
+
+    /* ─── ELEVATION ───────────────────────────── */
+    .elevation-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .elevation-box {
+      width: 96px;
+      height: 80px;
+      background: white;
+      border-radius: 8px;
+    }
+    .ev0 { box-shadow: none; border: 1px solid #E0E0E0; }
+    .ev1 { box-shadow: 0 2px 8px rgba(0,0,0,0.10); }
+    .ev2 { box-shadow: 0 4px 16px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.10); }
+    .ev3 { box-shadow: 0 8px 32px rgba(0,0,0,0.20), 0 2px 8px rgba(0,0,0,0.12); }
+
+    /* ─── BUTTONS ─────────────────────────────── */
+    .btn-ds {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 10px 20px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn-primary   { background: var(--color-navy-matte); color: #fff !important; }
+    .btn-primary:hover   { background: #19259f; }
+    .btn-primary-pressed { background: var(--color-navy-800); color: #fff; }
+    .btn-secondary        { background: transparent; color: var(--color-navy-700); border: 2px solid var(--color-navy-700); }
+    .btn-secondary-hover  { background: rgba(26,30,76,0.08); color: var(--color-navy-700); border: 2px solid var(--color-navy-700); }
+    .btn-secondary-pressed{ background: rgba(26,30,76,0.15); color: var(--color-navy-700); border: 2px solid var(--color-navy-700); }
+    .btn-cta-ds    { background: var(--color-amber-500); color: var(--color-navy-900); font-weight: 700; }
+    .btn-cta-hover { background: var(--color-amber-400); color: var(--color-navy-900); font-weight: 700; box-shadow: 0 4px 16px rgba(255,214,0,0.40); }
+    .btn-cta-pressed { background: var(--color-amber-600); color: var(--color-navy-900); font-weight: 700; }
+    .btn-text-ds   { background: transparent; color: var(--color-navy-600); text-decoration: underline; text-decoration-color: transparent; transition: all 0.15s; padding: 10px 0; }
+    .btn-text-hover { background: transparent; color: var(--color-navy-500); text-decoration: underline; padding: 10px 0; }
+    .btn-text-pressed { background: transparent; color: var(--color-navy-400); padding: 10px 0; }
+
+    .btn-ghost-ds  { background: transparent; color: #111118; border: 1.5px solid #D0D0C8; }
+    .btn-ghost-hover { background: #F0F0EA; color: #111118; border: 1.5px solid #B0B0A8; }
+    .btn-disabled  { opacity: 0.35; pointer-events: none; cursor: not-allowed; }
+
+    .state-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #888;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    /* Round variants */
+    .btn-round { border-radius: 999px; }
+    .btn-sm-ds { padding: 6px 14px; font-size: 11px; }
+    .btn-lg-ds { padding: 14px 28px; font-size: 15px; }
+
+    /* ─── INPUTS ──────────────────────────────── */
+    .input-ds {
+      width: 220px;
+      padding: 10px 14px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      border: 1.5px solid #C8C8C0;
+      border-radius: 6px;
+      background: white;
+      outline: none;
+      color: #111;
+      transition: border-color 0.15s;
+    }
+    .input-ds::placeholder { color: #AAAAAA; }
+    .input-ds.focused { border-color: var(--color-navy-700); box-shadow: 0 0 0 3px rgba(26,30,76,0.15); }
+    .input-ds.filled  { border-color: #C8C8C0; }
+    .input-ds.error   { border-color: #E53E3E; box-shadow: 0 0 0 3px rgba(229,62,62,0.12); }
+    .input-ds.success { border-color: #22D369; box-shadow: 0 0 0 3px rgba(34,211,105,0.12); }
+    .input-ds.disabled { opacity: 0.4; background: #F5F5F0; }
+
+    .input-icon-wrap {
+      position: relative;
+      display: inline-block;
+    }
+    .input-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #AAA;
+      font-size: 14px;
+    }
+    .input-icon-wrap .input-ds { padding-left: 36px; }
+
+    .error-msg { font-size: 11px; color: #E53E3E; margin-top: 4px; font-family: var(--font-mono); }
+    .success-msg { font-size: 11px; color: #22D369; margin-top: 4px; font-family: var(--font-mono); }
+
+    .select-ds {
+      width: 220px;
+      padding: 10px 36px 10px 14px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      border: 1.5px solid #C8C8C0;
+      border-radius: 6px;
+      background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center;
+      appearance: none;
+      color: #111;
+      outline: none;
+    }
+
+    /* ─── CHIPS ───────────────────────────────── */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .chip-default   { background: white; color: #333; border: 1.5px solid #C8C8C0; }
+    .chip-click     { background: white; color: var(--color-navy-700); border: 1.5px solid var(--color-navy-500); box-shadow: 0 1px 6px rgba(26,30,76,0.15); }
+    .chip-selected  { background: var(--color-navy-700); color: white; border: 1.5px solid var(--color-navy-700); }
+    .chip-amber     { background: rgba(255,214,0,0.15); color: var(--color-navy-900); border: 1.5px solid rgba(255,214,0,0.50); }
+    .chip-input     { background: white; color: #333; border: 1.5px solid #C8C8C0; }
+    .chip-remove    { opacity: 0.5; font-size: 12px; cursor: pointer; }
+
+    /* ─── TABS ────────────────────────────────── */
+    .tabs-ds {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid #E0E0D8;
+    }
+    .tab-ds {
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 10px 20px;
+      color: #888;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.15s;
+    }
+    .tab-ds.active { color: var(--color-navy-700); border-bottom-color: var(--color-navy-700); font-weight: 700; }
+
+    /* ─── ALERTS ──────────────────────────────── */
+    .alert-ds {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      width: 100%;
+      max-width: 420px;
+    }
+    .alert-icon { font-size: 18px; flex-shrink: 0; }
+    .alert-success { background: #ECFDF5; color: #15803D; border: 1px solid #86EFAC; }
+    .alert-info    { background: #EFF6FF; color: #1D4ED8; border: 1px solid #93C5FD; }
+    .alert-warning { background: #FFFBEB; color: #92400E; border: 1px solid #FCD34D; }
+    .alert-error   { background: #FEF2F2; color: #DC2626; border: 1px solid #FCA5A5; }
+
+    /* ─── CARDS ───────────────────────────────── */
+    .card-ds {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #E8E8E0;
+      overflow: hidden;
+    }
+    .card-ds-body { padding: 20px; }
+    .card-ds-title { font-family: var(--font-display); font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .card-ds-text  { font-size: 13px; color: #666; line-height: 1.5; }
+    .card-ds-image {
+      width: 100%;
+      height: 110px;
+      background: linear-gradient(135deg, #F0F0EA, #E0E0D8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      color: #C0C0B8;
+    }
+
+    .card-interactive {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #E8E8E0;
+      padding: 16px;
+      width: 260px;
+    }
+    .card-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .card-header-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(26,30,76,0.10);
+      color: var(--color-navy-700);
+    }
+    .card-stats {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+    .card-stat-item { font-size: 11px; color: #777; }
+    .card-stat-val  { font-family: var(--font-mono); font-size: 14px; font-weight: 700; color: #111; display: block; }
+    .card-divider   { border: none; border-top: 1px solid #E8E8E0; margin: 10px 0; }
+    .card-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      font-size: 13px;
+      color: #555;
+    }
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 12px;
+    }
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+    .badge-green { background: #ECFDF5; color: #15803D; }
+    .badge-amber { background: rgba(255,214,0,0.15); color: #92400E; }
+
+    /* ─── UX PRINCIPLES SIDEBAR ──────────────── */
+    .ux-block {
+      background: white;
+      border: 1.5px solid #E0E0D8;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 48px;
+    }
+    .ux-block-title {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-amber-600);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ux-principle {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #F0F0EA;
+    }
+    .ux-principle:last-child { border-bottom: none; }
+    .ux-num {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--color-amber-500);
+      line-height: 1;
+      min-width: 28px;
+    }
+    .ux-principle-name { font-size: 13px; font-weight: 700; color: #111; margin-bottom: 2px; }
+    .ux-principle-desc { font-size: 12px; color: #777; line-height: 1.4; }
+
+    /* ─── BRAND SECTION ───────────────────────── */
+    .brand-name-demo {
+      font-size: 88px;
+      font-weight: 700;
+      font-family: var(--font-logo);
+      line-height: 1;
+      color: #fcec12;
+      text-shadow: 3px 3px 0px #000;
+      display: inline-block;
+    }
+    .brand-tagline {
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: #888;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 8px;
+    }
+    .brand-combo {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px;
+      border-radius: 12px;
+    }
+    .brand-combo-dark {
+      background: var(--color-navy-900);
+    }
+    .brand-name-light {
+      font-family: var(--font-logo);
+      font-size: 57px;
+      font-weight: 700;
+      color: #fcec12;
+      text-shadow: 3px 3px 0 #000;
+      display: inline-block;
+    }
+
+    /* ─── ICON DIRECTION ──────────────────────── */
+    .icon-sample {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 16px;
+      border: 1px solid #E8E8E0;
+      border-radius: 8px;
+      background: white;
+    }
+    .icon-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      background: rgba(26,30,76,0.06);
+    }
+    .icon-circle-amber { background: rgba(255,214,0,0.15); }
+
+    /* ─── HR ──────────────────────────────────── */
+    hr.ds-divider {
+      border: none;
+      border-top: 1.5px solid #C8C8C0;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ══ PAGE HEADER ══════════════════════════ -->
+  <header class="page-header">
+    <h1 class="page-title">Design System<br>Styleguide</h1>
+    <div class="page-meta" style="display:flex; flex-direction:column; align-items:center; text-align:center;">
+      <span class="page-logo">Vidralpha</span>
+      <div style="font-size:10px; font-weight:600; color:#888; text-transform:uppercase; letter-spacing:1px;">
+        Esquadrias Premium
+      </div>
+      <span class="page-version" style="margin-top:4px;">v1.0</span>
+    </div>
+  </header>
+
+  <!-- ══ TWO-COLUMN LAYOUT ════════════════════ -->
+  <div class="ds-two-col">
+
+    <!-- LEFT COLUMN ─────────────────────────── -->
+    <div>
+
+      <!-- COLOR TOKENS ──────────────────────── -->
+      <section class="ds-section">
+        <h2 class="ds-section-title">Color tokens</h2>
+        <div class="ds-row">
+
+          <div class="color-swatch">
+            <div class="swatch-circle" style="background:#1A1E4C"></div>
+            <span class="swatch-hex">#1A1E4C</span>
+            <span class="swatch-name">Navy<br>Primary</span>
+          </div>
+
+          <div class="color-swatch">
+            <div class="swatch-circle" style="background:#FFD600"></div>
+            <span class="swatch-hex">#FFD600</span>
+            <span class="swatch-name">Amber<br>Accent</span>
+          </div>
+
+          <div class="color-swatch">
+            <div class="swatch-circle" style="background:#FFFFFF; border:1px solid #E8E8E0"></div>
+            <span class="swatch-hex">#FFFFFF</span>
+            <span class="swatch-name">Clean<br>Background</span>
+          </div>
+
+          <div class="color-swatch">
+            <div class="swatch-circle" style="background:#111118"></div>
+            <span class="swatch-hex">#111118</span>
+            <span class="swatch-name">Text<br>Primary</span>
+          </div>
+
+        </div>
+        <div class="ds-row" style="margin-top:18px">
+
+          <div class="color-swatch">
+            <div class="swatch-circle" style="background:#555566"></div>
+            <span class="swatch-hex">#555566</span>
+            <span class="swatch-name">Text<br>Secondary</span>
+          </div>
+
+          <div class="color-swatch">
+            <div class="swatch-circle" style="background:#C8C8C0"></div>
+            <span class="swatch-hex">#C8C8C0</span>
+            <span class="swatch-name">Border</span>
+          </div>
+
+          <div class="color-swatch">
+            <div class="swatch-circle" style="background:#F5F5F0"></div>
+            <span class="swatch-hex">#F5F5F0</span>
+            <span class="swatch-name">Surface<br>BG</span>
+          </div>
+
+          <div class="color-swatch">
+            <div class="swatch-ring"></div>
+            <span class="swatch-hex">Focus ring</span>
+            <span class="swatch-name">Navy 15%</span>
+          </div>
+
+        </div>
+        <div class="ds-row" style="margin-top:18px">
+          <div class="color-swatch">
+            <div class="swatch-circle" style="background:#22D369"></div>
+            <span class="swatch-hex">#22D369</span>
+            <span class="swatch-name">Success</span>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-circle" style="background:#4A88FF"></div>
+            <span class="swatch-hex">#4A88FF</span>
+            <span class="swatch-name">Info</span>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-circle" style="background:#FFB700"></div>
+            <span class="swatch-hex">#FFB700</span>
+            <span class="swatch-name">Warning</span>
+          </div>
+          <div class="color-swatch">
+            <div class="swatch-circle" style="background:#FF4C6A"></div>
+            <span class="swatch-hex">#FF4C6A</span>
+            <span class="swatch-name">Error</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- SPACING ───────────────────────────── -->
+      <section class="ds-section">
+        <h2 class="ds-section-title">Spacing · Grid 8pt</h2>
+        <div class="ds-row" style="align-items:flex-end">
+
+          <div class="spacing-item">
+            <div class="spacing-box" style="width:16px;height:16px"></div>
+            <span class="ds-label">4px</span>
+          </div>
+          <div class="spacing-item">
+            <div class="spacing-box" style="width:32px;height:32px"></div>
+            <span class="ds-label">8px</span>
+          </div>
+          <div class="spacing-item">
+            <div class="spacing-box" style="width:48px;height:48px"></div>
+            <span class="ds-label">16px</span>
+          </div>
+          <div class="spacing-item">
+            <div class="spacing-box" style="width:64px;height:64px"></div>
+            <span class="ds-label">24px</span>
+          </div>
+          <div class="spacing-item">
+            <div class="spacing-box" style="width:80px;height:80px"></div>
+            <span class="ds-label">32px</span>
+          </div>
+          <div class="spacing-item">
+            <div class="spacing-box" style="width:96px;height:96px"></div>
+            <span class="ds-label">48px</span>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ELEVATION ─────────────────────────── -->
+      <section class="ds-section">
+        <h2 class="ds-section-title">Elevation</h2>
+        <div class="ds-row">
+
+          <div class="elevation-item">
+            <div class="elevation-box ev0"></div>
+            <span class="ds-label">Level 0<br>(Flat)</span>
+          </div>
+          <div class="elevation-item">
+            <div class="elevation-box ev1"></div>
+            <span class="ds-label">Level 1<br>(Low)</span>
+          </div>
+          <div class="elevation-item">
+            <div class="elevation-box ev2"></div>
+            <span class="ds-label">Level 2<br>(Medium)</span>
+          </div>
+          <div class="elevation-item">
+            <div class="elevation-box ev3"></div>
+            <span class="ds-label">Level 3<br>(High)</span>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- BUTTONS ───────────────────────────── -->
+      <section class="ds-section">
+        <h2 class="ds-section-title">Buttons</h2>
+
+        <!-- CTA (Amber) -->
+        <p style="font-size:12px;font-weight:700;color:#AAA;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;margin-top:8px">CTA — Amber</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+          <div class="ds-col">
+            <span class="state-label">Normal</span>
+            <button class="btn-ds btn-cta-ds">Solicitar Orçamento</button>
+          </div>
+          <div class="ds-col">
+            <span class="state-label">Hover</span>
+            <button class="btn-ds btn-cta-hover">Solicitar Orçamento</button>
+          </div>
+          <div class="ds-col">
+            <span class="state-label">Pressed</span>
+            <button class="btn-ds btn-cta-pressed">Solicitar Orçamento</button>
+          </div>
+        </div>
+
+        <!-- Primary (Navy) -->
+        <p style="font-size:12px;font-weight:700;color:#AAA;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;margin-top:20px">Primary — Navy</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+          <div class="ds-col">
+            <span class="state-label">Normal</span>
+            <button class="btn-ds btn-primary">Ação Primária</button>
+          </div>
+          <div class="ds-col">
+            <span class="state-label">Hover</span>
+            <button class="btn-ds btn-primary" style="background:var(--color-navy-600)">Ação Primária</button>
+          </div>
+          <div class="ds-col">
+            <span class="state-label">Pressed</span>
+            <button class="btn-ds btn-primary-pressed">Ação Primária</button>
+          </div>
+          <div class="ds-col">
+            <span class="state-label">Disabled</span>
+            <button class="btn-ds btn-primary btn-disabled">Ação Primária</button>
+          </div>
+        </div>
+
+        <!-- Secondary -->
+        <p style="font-size:12px;font-weight:700;color:#AAA;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;margin-top:20px">Secondary — Outline</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+          <div class="ds-col">
+            <span class="state-label">Normal</span>
+            <button class="btn-ds btn-secondary">Ação Secundária</button>
+          </div>
+          <div class="ds-col">
+            <span class="state-label">Hover</span>
+            <button class="btn-ds btn-secondary-hover">Ação Secundária</button>
+          </div>
+          <div class="ds-col">
+            <span class="state-label">Pressed</span>
+            <button class="btn-ds btn-secondary-pressed">Ação Secundária</button>
+          </div>
+        </div>
+
+        <!-- Text link -->
+        <p style="font-size:12px;font-weight:700;color:#AAA;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;margin-top:20px">Text Link</p>
+        <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:center">
+          <div class="ds-col">
+            <span class="state-label">Normal</span>
+            <button class="btn-ds btn-text-ds">Saiba Mais</button>
+          </div>
+          <div class="ds-col">
+            <span class="state-label">Hover</span>
+            <button class="btn-ds btn-text-hover">Saiba Mais</button>
+          </div>
+          <div class="ds-col">
+            <span class="state-label">Ghost</span>
+            <button class="btn-ds btn-ghost-ds">Ver Todos</button>
+          </div>
+        </div>
+
+        <!-- Sizes -->
+        <p style="font-size:12px;font-weight:700;color:#AAA;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;margin-top:20px">Tamanhos</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+          <button class="btn-ds btn-primary btn-sm-ds btn-round">Pequeno</button>
+          <button class="btn-ds btn-primary btn-round">Médio</button>
+          <button class="btn-ds btn-primary btn-lg-ds btn-round">Grande</button>
+          <button class="btn-ds btn-cta-ds btn-lg-ds btn-round">CTA Grande →</button>
+        </div>
+      </section>
+
+      <!-- INPUTS ────────────────────────────── -->
+      <section class="ds-section">
+        <h2 class="ds-section-title">Inputs</h2>
+        <div style="display:flex;flex-direction:column;gap:20px">
+
+          <div class="ds-col">
+            <span class="state-label">Busca (com ícone)</span>
+            <div class="input-icon-wrap">
+              <span class="input-icon">🔍</span>
+              <input class="input-ds" type="text" placeholder="Buscar produtos..." />
+            </div>
+          </div>
+
+          <div style="display:flex;gap:20px;flex-wrap:wrap">
+            <div class="ds-col">
+              <span class="state-label">Default</span>
+              <input class="input-ds" type="text" placeholder="Placeholder texto" />
+            </div>
+            <div class="ds-col">
+              <span class="state-label">Focused</span>
+              <input class="input-ds focused" type="text" value="" placeholder="Campo ativo" />
+            </div>
+          </div>
+
+          <div style="display:flex;gap:20px;flex-wrap:wrap">
+            <div class="ds-col">
+              <span class="state-label">Preenchido</span>
+              <input class="input-ds filled" type="text" value="Fachada ACM Premium" />
+            </div>
+            <div class="ds-col">
+              <span class="state-label">Erro</span>
+              <input class="input-ds error" type="text" value="Texto inválido" />
+              <span class="error-msg">Campo obrigatório</span>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:20px;flex-wrap:wrap">
+            <div class="ds-col">
+              <span class="state-label">Sucesso</span>
+              <input class="input-ds success" type="text" value="Valor válido ✓" />
+              <span class="success-msg">Campo válido</span>
+            </div>
+            <div class="ds-col">
+              <span class="state-label">Dropdown</span>
+              <select class="select-ds">
+                <option>Selecione um produto</option>
+                <option>Box de Banheiro</option>
+                <option>Espelhos</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ALERTS ────────────────────────────── -->
+      <section class="ds-section">
+        <h2 class="ds-section-title">Alerts</h2>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="alert-ds alert-success">
+            <span class="alert-icon">✅</span>
+            <span>Orçamento enviado com sucesso!</span>
+          </div>
+          <div class="alert-ds alert-info">
+            <span class="alert-icon">ℹ️</span>
+            <span>Prazo estimado: 5 a 10 dias úteis.</span>
+          </div>
+          <div class="alert-ds alert-warning">
+            <span class="alert-icon">⚠️</span>
+            <span>Verifique as medidas antes de confirmar.</span>
+          </div>
+          <div class="alert-ds alert-error">
+            <span class="alert-icon">❌</span>
+            <span>Falha ao enviar. Tente novamente.</span>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /LEFT COLUMN -->
+
+    <!-- RIGHT COLUMN ────────────────────────── -->
+    <div>
+
+      <!-- TYPOGRAPHY SCALE ─────────────────── -->
+      <section class="ds-section">
+        <h2 class="ds-section-title">Typography scale</h2>
+
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:16px">
+          <div>
+            <div class="t-display">Display — Vidralpha</div>
+            <div class="type-meta">Syne 800 · 40px · -3% · line 1.1</div>
+          </div>
+          <div>
+            <div class="t-h1">Headline 1 — Design System</div>
+            <div class="type-meta">Syne 800 · 32px · -2% · line 1.15</div>
+          </div>
+          <div>
+            <div class="t-h2">Headline 2 — Section Title</div>
+            <div class="type-meta">Syne 700 · 24px · line 1.2</div>
+          </div>
+          <div>
+            <div class="t-subtitle">Subtitle — Descriptive Label</div>
+            <div class="type-meta">DM Sans 500 · 18px</div>
+          </div>
+          <div>
+            <div class="t-body1">Body 1 — Regular content text</div>
+            <div class="type-meta">DM Sans 400 · 16px · line 1.5</div>
+          </div>
+          <div>
+            <div class="t-body2">Body 2 — Smaller details</div>
+            <div class="type-meta">DM Sans 400 · 14px</div>
+          </div>
+          <div>
+            <div class="t-caption">Caption — Helper text</div>
+            <div class="type-meta">DM Sans 400 · 12px</div>
+          </div>
+          <div>
+            <div class="t-button">Button — Action Label</div>
+            <div class="type-meta">DM Sans 600 · 14px · +6% tracking</div>
+          </div>
+          <div>
+            <div class="t-mono">Mono — 4.2cm · #FFD600 · v1.0</div>
+            <div class="type-meta">JetBrains Mono · specs, código</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RADIUS ────────────────────────────── -->
+      <section class="ds-section">
+        <h2 class="ds-section-title">Radius</h2>
+        <div class="ds-row">
+          <div class="radius-item">
+            <div class="radius-box" style="border-radius:0"></div>
+            <span class="ds-label">None<br>(0px)</span>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="border-radius:4px"></div>
+            <span class="ds-label">Small<br>(4px)</span>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="border-radius:8px"></div>
+            <span class="ds-label">Medium<br>(8px)</span>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="border-radius:16px"></div>
+            <span class="ds-label">Large<br>(16px)</span>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="border-radius:24px"></div>
+            <span class="ds-label">XLarge<br>(24px)</span>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="border-radius:50%"></div>
+            <span class="ds-label">Full<br>(50%)</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHIPS ─────────────────────────────── -->
+      <section class="ds-section">
+        <h2 class="ds-section-title">Chips</h2>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:16px">
+          <div>
+            <span class="ds-label" style="display:block;margin-bottom:8px">Default · Click effect · Selected</span>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <span class="chip chip-default">Todos</span>
+              <span class="chip chip-click">Box Banheiro ↕</span>
+              <span class="chip chip-selected">Espelhos ✓</span>
+            </div>
+          </div>
+          <div>
+            <span class="ds-label" style="display:block;margin-bottom:8px">Amber · Input chip (removível)</span>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <span class="chip chip-amber">Destaque</span>
+              <span class="chip chip-input">Vidro Temperado <span class="chip-remove">✕</span></span>
+              <span class="chip chip-input">Fachada ACM <span class="chip-remove">✕</span></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TABS ──────────────────────────────── -->
+      <section class="ds-section">
+        <h2 class="ds-section-title">Tabs</h2>
+        <div class="tabs-ds" style="margin-top:16px">
+          <span class="tab-ds active">Visão Geral</span>
+          <span class="tab-ds">Especificações</span>
+          <span class="tab-ds">Instalação</span>
+          <span class="tab-ds">Garantia</span>
+        </div>
+      </section>
+
+      <!-- CARDS ─────────────────────────────── -->
+      <section class="ds-section">
+        <h2 class="ds-section-title">Cards</h2>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;align-items:flex-start">
+
+          <!-- Content card -->
+          <div class="card-ds" style="width:200px">
+            <div class="card-ds-image">🪟</div>
+            <div class="card-ds-body">
+              <div class="card-ds-title">Box Frameless</div>
+              <p class="card-ds-text">Vidro temperado 10mm, perfis em alumínio anodizado.</p>
+            </div>
+          </div>
+
+          <!-- Interactive card -->
+          <div class="card-interactive">
+            <div class="card-header-row">
+              <span style="font-size:14px;font-weight:700">Orçamento</span>
+              <span class="card-header-badge">● Em aberto</span>
+            </div>
+            <div class="card-stats">
+              <div class="card-stat-item">
+                Área<br><span class="card-stat-val">12m²</span>
+              </div>
+              <div class="card-stat-item">
+                Ref.<br><span class="card-stat-val">#4521</span>
+              </div>
+              <div class="card-stat-item">
+                Prazo<br><span class="card-stat-val">10d</span>
+              </div>
+            </div>
+            <hr class="card-divider" />
+            <div class="card-row">
+              <span>Produto</span>
+              <span style="font-weight:600">Box Frameless</span>
+            </div>
+            <div class="card-row">
+              <span>Status</span>
+              <span class="badge-status badge-green">● Aprovado</span>
+            </div>
+            <div class="card-row">
+              <span>Acabamento</span>
+              <span class="badge-status badge-amber">Fosco</span>
+            </div>
+            <div class="card-actions">
+              <button class="btn-ds btn-ghost-ds btn-sm-ds">Cancelar</button>
+              <button class="btn-ds btn-primary btn-sm-ds">Confirmar</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- BRAND IDENTITY ────────────────────── -->
+      <section class="ds-section">
+        <h2 class="ds-section-title">Identidade da Marca</h2>
+        <div style="display:flex;flex-direction:column;gap:16px;margin-top:16px">
+
+          <div style="padding:20px;background:white;border:1px solid #E0E0D8;border-radius:12px;text-align:center;display:flex;flex-direction:column;align-items:center;">
+            <div class="brand-name-demo">Vidralpha</div>
+            <div class="brand-tagline">Esquadrias Premium</div>
+          </div>
+
+          <div class="brand-combo brand-combo-dark">
+            <div>
+              <span class="brand-name-light">Vidralpha</span>
+              <span style="display:block;font-size:12px;color:rgba(255,255,255,0.50);letter-spacing:0.10em;text-transform:uppercase;margin-top:4px">Uso em fundo escuro</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ICON DIRECTION ────────────────────── -->
+      <section class="ds-section">
+        <h2 class="ds-section-title">Ícones — Direção de Estilo</h2>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+          <div class="icon-sample">
+            <div class="icon-circle">📐</div>
+            <span class="ds-label">Medição</span>
+          </div>
+          <div class="icon-sample">
+            <div class="icon-circle icon-circle-amber">🪟</div>
+            <span class="ds-label">Vidro</span>
+          </div>
+          <div class="icon-sample">
+            <div class="icon-circle">🪞</div>
+            <span class="ds-label">Espelho</span>
+          </div>
+          <div class="icon-sample">
+            <div class="icon-circle icon-circle-amber">🛡️</div>
+            <span class="ds-label">Garantia</span>
+          </div>
+          <div class="icon-sample">
+            <div class="icon-circle">⚡</div>
+            <span class="ds-label">Entrega</span>
+          </div>
+          <div class="icon-sample">
+            <div class="icon-circle icon-circle-amber">🏆</div>
+            <span class="ds-label">Qualidade</span>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /RIGHT COLUMN -->
+  </div><!-- /ds-two-col -->
+
+  <!-- ══ UX PRINCIPLES ════════════════════════ -->
+  <div class="ux-block">
+    <div class="ux-block-title">
+      <span>📐</span> Princípios UX aplicados — Design Principles in UI
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0">
+
+      <div class="ux-principle">
+        <span class="ux-num">1</span>
+        <div>
+          <p class="ux-principle-name">Emphasis / Hierarchy</p>
+          <p class="ux-principle-desc">CTA âmbar domina. Hierarquia de 3 níveis: display → heading → body.</p>
+        </div>
+      </div>
+
+      <div class="ux-principle">
+        <span class="ux-num">2</span>
+        <div>
+          <p class="ux-principle-name">Unity / Rhythm</p>
+          <p class="ux-principle-desc">Grid 8pt. Espaçamentos consistentes. Tokens reutilizáveis.</p>
+        </div>
+      </div>
+
+      <div class="ux-principle">
+        <span class="ux-num">3</span>
+        <div>
+          <p class="ux-principle-name">Contrast</p>
+          <p class="ux-principle-desc">Âmbar sobre navy. WCAG AA mínimo em todos os elementos.</p>
+        </div>
+      </div>
+
+      <div class="ux-principle">
+        <span class="ux-num">4</span>
+        <div>
+          <p class="ux-principle-name">Balance</p>
+          <p class="ux-principle-desc">Layout 2 colunas simétricas. Distribuição equilibrada de peso visual.</p>
+        </div>
+      </div>
+
+      <div class="ux-principle">
+        <span class="ux-num">5</span>
+        <div>
+          <p class="ux-principle-name">Proportion / Scale</p>
+          <p class="ux-principle-desc">Major Third (1.25×) na escala tipo. Tamanhos de botão em 3 níveis.</p>
+        </div>
+      </div>
+
+      <div class="ux-principle">
+        <span class="ux-num">6</span>
+        <div>
+          <p class="ux-principle-name">Similarity</p>
+          <p class="ux-principle-desc">Componentes do mesmo tipo compartilham estrutura, cor e comportamento.</p>
+        </div>
+      </div>
+
+      <div class="ux-principle">
+        <span class="ux-num">7</span>
+        <div>
+          <p class="ux-principle-name">Emphasis / Dominance</p>
+          <p class="ux-principle-desc">Ponto focal único por seção. Glow âmbar como marcador de atenção.</p>
+        </div>
+      </div>
+
+      <div class="ux-principle" style="border-bottom:none">
+        <span class="ux-num" style="color:#C8C8C0">+</span>
+        <div>
+          <p class="ux-principle-name" style="color:#AAA">Motion</p>
+          <p class="ux-principle-desc">fadeUp 0.8s · tilt 8° · glow pulse 3s · magnetic CTA</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ FOOTER ════════════════════════════════ -->
+  <footer style="margin-top:48px;padding-top:24px;border-top:1.5px solid #C8C8C0;display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#AAA">tokens.css · components.css · main.js</span>
+    </div>
+    <div style="text-align:right">
+      <span style="font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#1A1E4C">Vidralpha</span>
+      <span style="display:block;font-family:'JetBrains Mono',monospace;font-size:10px;color:#CCC;margin-top:2px">Design System v1.0 · 2026</span>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

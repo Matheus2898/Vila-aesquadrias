@@ -1,0 +1,340 @@
+/* ═══════════════════════════════════════════════════════════════
+   VIDRALPHA — DESIGN SYSTEM TOKENS
+   Conceito Visual: "Vidro Líquido"
+   Versão: 1.0 | 2026
+═══════════════════════════════════════════════════════════════ */
+
+:root {
+
+  /* ─────────────────────────────────────────
+     🎨 PALETA DE CORES — TOKENS PRIMÁRIOS
+  ───────────────────────────────────────── */
+
+  /* Navy (Base escura — identidade da marca) */
+  --color-navy-950: #050714;
+  --color-navy-900: #0A0D2E;
+  --color-navy-800: #19259f; /* AZUL OFICIAL DA MARCA */
+  --color-navy-700: #1E2DBF;
+  --color-navy-600: #2538E6;
+  --color-navy-500: #4D5CF0;
+  --color-navy-400: #7A86F5;
+  --color-navy-300: #A7AFF9;
+  --color-navy-200: #D3D7FD;
+  --color-navy-100: #E9EBFE;
+  --color-navy-matte: rgba(25, 37, 159, 0.85); /* AZUL FOSCO PARA BOTÕES */
+
+  /* Âmbar/Amarelo (Identidade da marca — acento primário) */
+  --color-amber-950: #333100;
+  --color-amber-900: #5C5800;
+  --color-amber-800: #858000;
+  --color-amber-700: #B3AD00;
+  --color-amber-600: #D6CF00;
+  --color-amber-500: #fcec12; /* AMARELO OFICIAL DA MARCA - LOGO */
+  --color-amber-400: #FDF033;
+  --color-amber-300: #FDF366;
+  --color-amber-200: #FEF799;
+  --color-amber-100: #FEFACC;
+
+  /* Neutros / Superfície (Alterado para fundo branco) */
+  --color-neutral-0:   #FFFFFF;
+  --color-neutral-50:  #FAFAFA;
+  --color-neutral-100: #F5F5F0;
+  --color-neutral-200: #E8E8E0;
+  --color-neutral-300: #D0D0C8;
+  --color-neutral-400: #A0A098;
+  --color-neutral-500: #707068;
+  --color-neutral-600: #444448;
+  --color-neutral-700: #222228;
+  --color-neutral-800: #111118;
+  --color-neutral-900: #060608;
+
+  /* Vidro / Glass (Ajustado para fundo claro) */
+  --color-glass-0:   rgba(255, 255, 255, 0.00);
+  --color-glass-4:   rgba(13, 15, 28, 0.04);
+  --color-glass-8:   rgba(13, 15, 28, 0.08);
+  --color-glass-12:  rgba(13, 15, 28, 0.12);
+  --color-glass-20:  rgba(13, 15, 28, 0.20);
+  --color-glass-40:  rgba(13, 15, 28, 0.40);
+
+  /* Status */
+  --color-success:    #15803D;
+  --color-success-bg: #ECFDF5;
+  --color-warning:    #B45309;
+  --color-warning-bg: #FFFBEB;
+  --color-error:      #DC2626;
+  --color-error-bg:   #FEF2F2;
+  --color-info:       #1D4ED8;
+  --color-info-bg:    #EFF6FF;
+
+  /* ─────────────────────────────────────────
+     🎨 ALIASES SEMÂNTICOS (Uso no código)
+  ───────────────────────────────────────── */
+  --bg-base:        #FFFFFF;
+  --bg-elevated:    var(--color-neutral-50);
+  --bg-overlay:     var(--color-neutral-100);
+  --bg-glass:       var(--color-glass-4);
+  --bg-glass-heavy: var(--color-glass-8);
+
+  --text-primary:   #111118;
+  --text-secondary: #444448;
+  --text-tertiary:  #707068;
+  --text-disabled:  #A0A098;
+  --text-inverse:   #FFFFFF;
+
+  --accent-primary:   var(--color-amber-500);
+  --accent-secondary: var(--color-navy-800);
+  --accent-glow:      rgba(255, 214, 0, 0.20);
+  --accent-glow-strong: rgba(255, 214, 0, 0.40);
+
+  --border-subtle:  var(--color-neutral-200);
+  --border-light:   var(--color-neutral-300);
+  --border-accent:  rgba(255, 214, 0, 0.35);
+  --border-focus:   var(--color-navy-800);
+
+  /* ─────────────────────────────────────────
+     📐 TIPOGRAFIA
+  ───────────────────────────────────────── */
+
+  /* Fontes — importadas via HTML */
+  --font-logo:    'Dancing Script', cursive; /* Fonte do logo Vidralpha */
+  --font-display: 'Syne', sans-serif;   /* Geométrica tectônica, títulos */
+  --font-body:    'DM Sans', sans-serif; /* Humanista, legibilidade premium */
+  --font-mono:    'JetBrains Mono', monospace; /* Medidas técnicas, specs */
+
+  /* Escala tipográfica — base 16px, ratio 1.25 (Major Third) */
+  --text-xs:   0.640rem;  /* 10.24px — Caption, badges */
+  --text-sm:   0.800rem;  /* 12.80px — Labels, tags */
+  --text-base: 1.000rem;  /* 16.00px — Body */
+  --text-lg:   1.250rem;  /* 20.00px — Body large, subtitle */
+  --text-xl:   1.563rem;  /* 25.00px — H6 / Subheading */
+  --text-2xl:  1.953rem;  /* 31.25px — H5 */
+  --text-3xl:  2.441rem;  /* 39.06px — H4 */
+  --text-4xl:  3.052rem;  /* 48.83px — H3 */
+  --text-5xl:  3.815rem;  /* 61.04px — H2 */
+  --text-6xl:  4.768rem;  /* 76.29px — H1 */
+  --text-7xl:  5.960rem;  /* 95.37px — Display */
+  --text-8xl:  7.451rem;  /* 119.2px — Hero giant */
+
+  /* Line heights */
+  --leading-tight:   1.15;
+  --leading-snug:    1.30;
+  --leading-normal:  1.50;
+  --leading-relaxed: 1.65;
+  --leading-loose:   1.80;
+
+  /* Letter spacing */
+  --tracking-tight:   -0.04em;
+  --tracking-snug:    -0.02em;
+  --tracking-normal:   0.00em;
+  --tracking-wide:     0.06em;
+  --tracking-wider:    0.12em;
+  --tracking-widest:   0.20em;
+
+  /* Font weights */
+  --weight-light:      300;
+  --weight-regular:    400;
+  --weight-medium:     500;
+  --weight-semibold:   600;
+  --weight-bold:       700;
+  --weight-extrabold:  800;
+
+  /* ─────────────────────────────────────────
+     📐 ESPAÇAMENTO — Grid 8pt
+  ───────────────────────────────────────── */
+  --space-1:   0.25rem;  /* 4px */
+  --space-2:   0.50rem;  /* 8px */
+  --space-3:   0.75rem;  /* 12px */
+  --space-4:   1.00rem;  /* 16px */
+  --space-5:   1.25rem;  /* 20px */
+  --space-6:   1.50rem;  /* 24px */
+  --space-8:   2.00rem;  /* 32px */
+  --space-10:  2.50rem;  /* 40px */
+  --space-12:  3.00rem;  /* 48px */
+  --space-16:  4.00rem;  /* 64px */
+  --space-20:  5.00rem;  /* 80px */
+  --space-24:  6.00rem;  /* 96px */
+  --space-32:  8.00rem;  /* 128px */
+  --space-40:  10.0rem;  /* 160px */
+  --space-48:  12.0rem;  /* 192px */
+
+  /* Section padding */
+  --section-sm:  var(--space-12);
+  --section-md:  var(--space-20);
+  --section-lg:  var(--space-32);
+  --section-xl:  var(--space-48);
+
+  /* Container */
+  --container-sm:  640px;
+  --container-md:  768px;
+  --container-lg:  1024px;
+  --container-xl:  1280px;
+  --container-2xl: 1440px;
+  --container-fluid: calc(100% - 4rem);
+
+  /* ─────────────────────────────────────────
+     🔲 BORDAS E RAIOS
+  ───────────────────────────────────────── */
+  --radius-none:   0px;
+  --radius-xs:     2px;
+  --radius-sm:     4px;
+  --radius-md:     8px;
+  --radius-lg:     12px;
+  --radius-xl:     16px;
+  --radius-2xl:    24px;
+  --radius-3xl:    32px;
+  --radius-full:   9999px;
+
+  /* Border width */
+  --border-1: 1px;
+  --border-2: 2px;
+  --border-4: 4px;
+
+  /* ─────────────────────────────────────────
+     🌑 SOMBRAS
+  ───────────────────────────────────────── */
+
+  /* Elevation system */
+  --shadow-xs:    0 1px 3px rgba(0,0,0,0.40);
+  --shadow-sm:    0 4px 12px rgba(0,0,0,0.50);
+  --shadow-md:    0 8px 24px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.40);
+  --shadow-lg:    0 16px 48px rgba(0,0,0,0.60), 0 4px 16px rgba(0,0,0,0.45);
+  --shadow-xl:    0 32px 80px rgba(0,0,0,0.65), 0 8px 24px rgba(0,0,0,0.50);
+  --shadow-2xl:   0 64px 120px rgba(0,0,0,0.70), 0 16px 40px rgba(0,0,0,0.55);
+
+  /* Glow system */
+  --glow-amber-sm:  0 0 12px rgba(255, 214, 0, 0.25), 0 0 24px rgba(255, 214, 0, 0.12);
+  --glow-amber-md:  0 0 24px rgba(255, 214, 0, 0.40), 0 0 48px rgba(255, 214, 0, 0.20);
+  --glow-amber-lg:  0 0 48px rgba(255, 214, 0, 0.55), 0 0 96px rgba(255, 214, 0, 0.25);
+  --glow-navy-sm:   0 0 12px rgba(35, 40, 114, 0.40);
+  --glow-navy-md:   0 0 32px rgba(35, 40, 114, 0.55);
+
+  /* Inset glow */
+  --inset-glow-amber: inset 0 1px 0 rgba(255, 214, 0, 0.25);
+  --inset-glow-white: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+
+  /* ─────────────────────────────────────────
+     🎞 GRADIENTES
+  ───────────────────────────────────────── */
+
+  /* Background gradients */
+  --gradient-base: linear-gradient(
+    160deg,
+    #FFFFFF 0%,
+    #FDFDFD 40%,
+    var(--color-neutral-100) 100%
+  );
+  --gradient-hero: radial-gradient(
+    ellipse 80% 60% at 50% 0%,
+    rgba(255, 214, 0, 0.08) 0%,
+    transparent 70%
+  );
+  --gradient-amber-radial: radial-gradient(
+    ellipse 60% 40% at 50% 50%,
+    rgba(255, 214, 0, 0.15) 0%,
+    transparent 70%
+  );
+
+  /* Accent gradients */
+  --gradient-amber: linear-gradient(135deg, #FFD600 0%, #FFA500 100%);
+  --gradient-amber-subtle: linear-gradient(135deg, rgba(255,214,0,0.15) 0%, rgba(255,165,0,0.05) 100%);
+  --gradient-navy: linear-gradient(135deg, var(--color-navy-800) 0%, var(--color-navy-600) 100%);
+  --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.4) 100%);
+
+  /* Text gradients */
+  --gradient-text-amber: linear-gradient(135deg, #FFD600 0%, #FFB700 50%, #FF8C00 100%);
+  --gradient-text-dark: linear-gradient(135deg, var(--color-navy-900) 0%, var(--color-navy-800) 100%);
+
+  /* ─────────────────────────────────────────
+     ⚡ TRANSITIONS / MOTION
+  ───────────────────────────────────────── */
+
+  /* Durations */
+  --duration-instant: 80ms;
+  --duration-fast:    150ms;
+  --duration-normal:  250ms;
+  --duration-slow:    400ms;
+  --duration-slower:  600ms;
+  --duration-lazy:    900ms;
+
+  /* Easings */
+  --ease-out:        cubic-bezier(0.00, 0.00, 0.20, 1.00);
+  --ease-in:         cubic-bezier(0.40, 0.00, 1.00, 1.00);
+  --ease-in-out:     cubic-bezier(0.40, 0.00, 0.20, 1.00);
+  --ease-spring:     cubic-bezier(0.34, 1.56, 0.64, 1.00);
+  --ease-glass:      cubic-bezier(0.16, 1.00, 0.30, 1.00);
+
+  /* Shorthand transitions */
+  --transition-fast:   all var(--duration-fast) var(--ease-out);
+  --transition-normal: all var(--duration-normal) var(--ease-out);
+  --transition-slow:   all var(--duration-slow) var(--ease-out);
+  --transition-glass:  all var(--duration-slow) var(--ease-glass);
+
+  /* ─────────────────────────────────────────
+     🔲 BLUR (Glassmorphism)
+  ───────────────────────────────────────── */
+  --blur-sm:   4px;
+  --blur-md:   12px;
+  --blur-lg:   24px;
+  --blur-xl:   40px;
+  --blur-2xl:  60px;
+
+  /* ─────────────────────────────────────────
+     📐 Z-INDEX
+  ───────────────────────────────────────── */
+  --z-below:    -1;
+  --z-base:      0;
+  --z-raised:    10;
+  --z-dropdown:  100;
+  --z-sticky:    200;
+  --z-overlay:   300;
+  --z-modal:     400;
+  --z-toast:     500;
+  --z-tooltip:   600;
+}
+
+/* ─────────────────────────────────────────
+   💎 GLASSMORPHISM UTILITIES
+───────────────────────────────────────── */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+}
+
+.glass-dark {
+  background: rgba(13, 15, 28, 0.6) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Ajustes finos nos cards para E-commerce */
+.card-ds.ecommerce-card {
+  transition: all 0.3s ease;
+  border-radius: var(--radius-lg);
+  background: white;
+}
+.card-ds.ecommerce-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Botão de Detalhes Refinado */
+.btn-ds.btn-details {
+  background: var(--color-navy-900);
+  color: white;
+  padding: 10px 16px;
+  font-size: 13px !important; /* Fonte menor */
+  border-radius: var(--radius-full) !important; /* Bordas bem arredondadas */
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: normal;
+  border: none;
+}
+.btn-ds.btn-details:hover {
+  background: var(--color-navy-800);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(13, 15, 28, 0.3);
+}

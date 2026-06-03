@@ -1,0 +1,333 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Montserrat:wght@100..900&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@import './styles/tokens.css';
+@import './styles/components.css';
+
+/* ─────────────────────────────────────────
+   🌊 SCROLL ANIMATIONS (Reveal on Scroll)
+───────────────────────────────────────── */
+.scroll-left,
+.scroll-right,
+.scroll-top,
+.scroll-bottom,
+.blur,
+.lista .elementor-icon-list-item {
+  opacity: 0;
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity, filter;
+}
+
+.scroll-left {
+  transform: translateX(-60px);
+}
+
+.scroll-right {
+  transform: translateX(60px);
+}
+
+.scroll-top {
+  transform: translateY(-60px);
+}
+
+.scroll-bottom {
+  transform: translateY(60px);
+}
+
+.blur {
+  filter: blur(10px);
+}
+
+.ativo {
+  opacity: 1 !important;
+  transform: translate(0, 0) !important;
+  filter: blur(0) !important;
+}
+
+/* React Root Fix */
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ─── MOBILE OVERRIDES ─────────────────────────────────────── */
+.profile-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.profile-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.profile-hub-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+}
+
+.profile-flex-stack {
+  display: flex;
+}
+
+.profile-page-container {
+  min-height: 100vh;
+  background: #FFFFFF;
+  padding-bottom: 120px;
+}
+
+.profile-banner {
+  background: #000000;
+  padding: 100px 0;
+  color: white;
+  text-align: center;
+}
+
+.profile-content-margin {
+  margin-top: 120px;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.profile-form-card {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  border: 1px solid #E8E8E0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+@media (max-width: 768px) {
+
+  .profile-grid-2,
+  .profile-grid-3,
+  .profile-hub-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .profile-flex-stack {
+    flex-direction: column !important;
+  }
+
+  .hide-on-mobile {
+    display: none !important;
+  }
+
+  .profile-page-container {
+    padding-bottom: 40px !important;
+  }
+
+  .profile-banner {
+    padding: 60px 0 !important;
+  }
+
+  .profile-content-margin {
+    margin-top: 40px !important;
+    scroll-margin-top: 100px;
+  }
+
+  .profile-form-card {
+    padding: 24px !important;
+  }
+
+  /* OVERRIDES PARA O MODAL ADMIN mobile */
+  .preco-label-mobile {
+    white-space: nowrap !important;
+    font-size: 11.5px !important;
+  }
+
+  .gallery-box-mobile-fix {
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  /* MODAL ADMIN: Variações de Medidas */
+  .add-measure-btn {
+    background: transparent !important;
+    color: #1E24A0 !important;
+    padding: 0 !important;
+    font-size: 12px !important;
+    text-decoration: underline !important;
+    border: none !important;
+  }
+
+  .dashboard-header,
+  .admin-header {
+    text-align: center;
+    justify-content: center !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  /* Dropdowns de vidro idênticos aos botões de medida */
+  .glass-dropdown-wrapper {
+    max-width: 250px !important;
+    margin: 0 auto !important;
+  }
+
+  .add-measure-btn .add-measure-icon {
+    display: none !important;
+  }
+
+  .add-measure-btn .mobile-text {
+    display: inline !important;
+  }
+
+  .add-measure-btn .desktop-text {
+    display: none !important;
+  }
+
+  .measure-title-mobile-fix {
+    white-space: nowrap !important;
+    font-size: 10.5px !important;
+    letter-spacing: 0 !important;
+  }
+
+  /* ALINHAMENTOS: Filtros Laterais Catálogo */
+  .catalog-sidebar h3,
+  .catalog-sidebar ul,
+  .catalog-sidebar li,
+  .catalog-sidebar label,
+  .catalog-sidebar div {
+    text-align: left !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+  }
+
+  /* ALINHAMENTOS: Formulário de Contato e Textos Iniciais */
+  .contact-form-grid {
+    text-align: left !important;
+  }
+
+  .contact-form-grid form label,
+  .contact-form-grid>div>h2,
+  .contact-form-grid>div>p {
+    text-align: left !important;
+  }
+
+  .contact-form-grid form {
+    align-items: stretch !important;
+    width: 100% !important;
+  }
+
+  .contact-form-grid form>div {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch !important;
+    width: 100% !important;
+  }
+
+  /* ESPAÇAMENTO: Vantagens Home */
+  .trust-bar-section {
+    padding-top: 90px !important;
+    margin-top: -48px !important;
+    background: white !important;
+    position: relative;
+    z-index: 20;
+  }
+
+  /* LARGURA DOS CARDS HOME E CATALOGO */
+  .launches-grid,
+  .ecommerce-grid {
+    padding: 0 20px !important;
+  }
+
+  /* UTILITÁRIOS DE GRID MOBILE */
+  .ds-two-col,
+  .ds-three-col {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .ds-grid-mobile-stack {
+    grid-template-columns: 1fr !important;
+  }
+
+  .ds-mobile-full-width {
+    width: 100% !important;
+  }
+}
+
+
+.add-measure-btn {
+  padding: 6px 12px;
+  background: var(--color-amber-500);
+  color: var(--color-navy-900);
+  border-radius: 6px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.add-measure-btn .mobile-text {
+  display: none;
+}
+
+.add-measure-btn .desktop-text {
+  display: inline;
+}
+
+/* ─────────────────────────────────────────
+   🔥 HUB BUTTONS HOVER EFFECT
+   ───────────────────────────────────────── */
+.hub-card:hover {
+  transform: translateY(-8px) !important;
+  box-shadow: 0 15px 35px rgba(30, 36, 160, 0.12) !important;
+  border-color: var(--color-navy-700) !important;
+}
+
+.hub-card:hover div {
+  transform: scale(1.1);
+  background: var(--color-navy-700) !important;
+  color: white !important;
+}
+
+/* ─────────────────────────────────────────
+   🖱️ CATEGORY NAVBAR SCROLLBAR HIDE
+   ───────────────────────────────────────── */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* ─────────────────────────────────────────
+   🖼️ HERO SLIDER CONTAINER
+   ───────────────────────────────────────── */
+.hero-slider-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1920 / 600;
+  background-color: var(--color-navy-900);
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .hero-slider-container {
+    aspect-ratio: 4 / 5;
+    min-height: 500px;
+  }
+}
+
+/* Regras em CSS puro para resolver bug de resizing no Javascript */
+.hero-content-inner.align-left {
+  margin-left: 0;
+}
+.hero-content-inner.align-right {
+  margin-right: 0;
+}
+
+@media (min-width: 1440px) {
+  .hero-content-inner.align-left.has-offset {
+    margin-left: var(--custom-offset);
+  }
+  .hero-content-inner.align-right.has-offset {
+    margin-right: var(--custom-offset);
+  }
+}
