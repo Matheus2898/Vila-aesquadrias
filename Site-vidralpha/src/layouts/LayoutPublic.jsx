@@ -474,7 +474,7 @@ export default function LayoutPublic() {
           {/* Copyright */}
           <div style={{ borderTop: '1px solid #E8E8E0', width: '100%', paddingTop: '32px', color: '#999', fontSize: '13px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <span>&copy; {new Date().getFullYear()} Vilaça Esquadrias e Vidros. Todos os direitos reservados.</span>
-            <span style={{ fontWeight: 600 }}>CNPJ: 48.652.898/0001-09</span>
+            <span style={{ fontWeight: 600 }}>CNPJ: 67.033.863/0001-36</span>
           </div>
 
         </div>
