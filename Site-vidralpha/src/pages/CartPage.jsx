@@ -13,6 +13,7 @@ export default function CartPage() {
     const [freightLoading, setFreightLoading] = useState(false);
     const [freightResult, setFreightResult] = useState(null);
     const [selectedFreight, setSelectedFreight] = useState(null);
+    const [checkoutLoading, setCheckoutLoading] = useState(false);
 
     const fmt = (v) => Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -57,6 +58,48 @@ export default function CartPage() {
             ]);
         }
         setFreightLoading(false);
+    }
+
+    async function handleCheckout() {
+        if (!selectedFreight) {
+            toast.error("Por favor, calcule e selecione o frete primeiro.");
+            return;
+        }
+
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            toast.error("Você precisa estar logado para comprar.");
+            return;
+        }
+
+        setCheckoutLoading(true);
+        try {
+            const { data, error } = await supabase.functions.invoke('lalamove-checkout', {
+                body: {
+                    itens: items,
+                    enderecoEntrega: {
+                        lat: "-23.5505", // Pode ser melhorado depois com Geocoding real
+                        lng: "-46.6333",
+                        address: cep
+                    }
+                }
+            });
+
+            if (error) throw error;
+            if (data.error) throw new Error(data.error);
+
+            if (data && data.preferenceId) {
+                // Redireciona para o Mercado Pago Checkout Pro
+                window.location.href = `https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=${data.preferenceId}`;
+            } else {
+                throw new Error("Não foi possível gerar o pagamento.");
+            }
+        } catch (err) {
+            console.error("Erro no checkout:", err);
+            toast.error(err.message || "Erro ao processar checkout. Tente novamente.");
+        } finally {
+            setCheckoutLoading(false);
+        }
     }
 
     if (items.length === 0) {
@@ -300,22 +343,25 @@ export default function CartPage() {
                             </div>
                         </div>
 
-                        <Link
-                            to="/checkout"
+                        <button
+                            onClick={handleCheckout}
+                            disabled={checkoutLoading}
                             className="btn-ds btn-primary"
                             style={{
                                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
-                                width: '100%', padding: '18px', marginTop: '32px',
-                                borderRadius: '14px', textDecoration: 'none',
+                                width: '100%', padding: '18px', marginTop: '32px', border: 'none',
+                                borderRadius: '14px', textDecoration: 'none', cursor: checkoutLoading ? 'not-allowed' : 'pointer',
                                 fontSize: '16px', fontWeight: 800,
                                 boxShadow: '0 10px 20px rgba(26, 45, 161, 0.2)',
-                                transition: 'all 0.3s'
+                                transition: 'all 0.3s',
+                                opacity: checkoutLoading ? 0.7 : 1
                             }}
-                            onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 15px 30px rgba(26, 45, 161, 0.3)' }}
-                            onMouseOut={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 20px rgba(26, 45, 161, 0.2)' }}
+                            onMouseOver={e => { if(!checkoutLoading) { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 15px 30px rgba(26, 45, 161, 0.3)' } }}
+                            onMouseOut={e => { if(!checkoutLoading) { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 20px rgba(26, 45, 161, 0.2)' } }}
                         >
-                            Finalizar Compra <ArrowRight size={20} />
-                        </Link>
+                            {checkoutLoading ? <Loader2 className="animate-spin" size={20} /> : 'Finalizar Compra'} 
+                            {!checkoutLoading && <ArrowRight size={20} />}
+                        </button>
 
                         <div style={{ marginTop: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#94A3B8', fontSize: '12px' }}>
                             <ShieldCheck size={16} /> Compra 100% Segura

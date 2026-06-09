@@ -17,6 +17,7 @@ const LALAMOVE_MARKET     = Deno.env.get("LALAMOVE_MARKET") ?? "BR";
 
 const SUPABASE_URL        = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+const MERCADOPAGO_ACCESS_TOKEN = Deno.env.get("MERCADOPAGO_ACCESS_TOKEN") ?? "";
 
 // Cabeçalhos CORS para o frontend React
 const CORS_HEADERS = {
@@ -220,50 +221,11 @@ serve(async (req: Request) => {
 
     console.log(`[Checkout] Cotação OK. ID: ${quotationId}, Preço: R$${precoFrete}`);
 
-    // 7. Monta payload do PEDIDO (Place Order) — trava o preço
+    // 7. Salva o pedido na tabela `orders` do Supabase com status pending_payment
     const totalProdutos = itens.reduce((soma: number, item: { price: number; quantity: number }) =>
       soma + (item.price * item.quantity), 0
     );
 
-    const payloadPedido = {
-      data: {
-        quotationId,  // ID da cotação para cravar o preço
-        sender: {
-          stopIndex: "0",
-          name:      "Vidralpha Fábrica",          // 👈 Nome do remetente
-          phone:     Deno.env.get("LALAMOVE_SENDER_PHONE") ?? "+5511999999999", // 👈 Telefone
-        },
-        recipients: [
-          {
-            stopIndex: "1",
-            name:      user.email ?? "Cliente",
-            phone:     enderecoEntrega?.phone ?? "+5511999999999",
-          },
-        ],
-        isRecipientSMSEnabled: true,
-        isPODEnabled: false,
-        item: payloadCotacao.data.item,
-        metadata: {
-          orderId: user.id,
-        },
-      },
-    };
-
-    // 8. Chama o endpoint Place Order — CRAVO DO PREÇO
-    const resultPedido = await requestLalamove("POST", "/v3/orders", payloadPedido);
-    if (!resultPedido.ok) {
-      return new Response(JSON.stringify({
-        error: "Erro ao criar pedido na Lalamove: " + resultPedido.error,
-      }), { status: 502, headers: CORS_HEADERS });
-    }
-
-    const pedidoLala = resultPedido.data as { data: { orderId: string; shareLink?: string } };
-    const lalamoveOrderId = pedidoLala?.data?.orderId;
-    const shareLink       = pedidoLala?.data?.shareLink ?? null;
-
-    console.log(`[Checkout] Pedido Lalamove criado! ID: ${lalamoveOrderId}`);
-
-    // 9. Salva o pedido na tabela `orders` do Supabase
     const { data: novoPedido, error: dbError } = await supabase
       .from("orders")
       .insert({
@@ -271,12 +233,10 @@ serve(async (req: Request) => {
         items:                itens,
         total_price:          totalProdutos + precoFrete,
         freight_price:        precoFrete,
-        status:               "confirmed",
+        status:               "pending_payment", // Alterado para aguardar pagamento
         status_producao:      "Pendente",
-        lalamove_order_id:    lalamoveOrderId,
-        lalamove_quotation_id: quotationId,
+        lalamove_quotation_id: quotationId, // Guardamos a cotação para o Webhook usar depois
         schedule_at:          scheduleAtISO,
-        lalamove_share_link:  shareLink,
         delivery_address:     enderecoEntrega,
         prazo_dias_uteis:     prazoEmDiasUteis,
       })
@@ -285,25 +245,79 @@ serve(async (req: Request) => {
 
     if (dbError) {
       console.error("[DB] Erro ao salvar pedido:", dbError);
-      // Pedido criado na Lalamove mas falhou no banco — logar para reconciliação manual
       return new Response(JSON.stringify({
-        error: "Pedido criado na Lalamove mas falhou ao salvar no banco. Contate o suporte.",
-        lalamoveOrderId,
+        error: "Erro ao criar pedido no banco de dados.",
       }), { status: 500, headers: CORS_HEADERS });
     }
 
-    // 10. Limpa o carrinho do usuário no banco
+    // 8. Cria a Preferência no Mercado Pago
+    const origin = req.headers.get("origin") ?? "http://localhost:5173";
+    
+    // Mapeia os itens para o formato do Mercado Pago
+    const mpItems = itens.map((item: any) => ({
+      id: String(item.product_id),
+      title: item.name || "Produto Vidralpha",
+      quantity: Number(item.quantity),
+      unit_price: Number(item.price),
+      currency_id: "BRL"
+    }));
+
+    // Adiciona o frete como um item na preferência
+    if (precoFrete > 0) {
+      mpItems.push({
+        id: "frete",
+        title: "Frete Lalamove",
+        quantity: 1,
+        unit_price: Number(precoFrete),
+        currency_id: "BRL"
+      });
+    }
+
+    const preferencePayload = {
+      items: mpItems,
+      payer: {
+        email: user.email,
+        name: user.user_metadata?.full_name || "Cliente",
+      },
+      back_urls: {
+        success: `${origin}/profile`, // Redireciona para o perfil após sucesso
+        failure: `${origin}/cart`,
+        pending: `${origin}/cart`
+      },
+      auto_return: "approved",
+      external_reference: novoPedido.id, // Vincula o pagamento ao ID do nosso pedido
+      notification_url: `${SUPABASE_URL}/functions/v1/mercadopago-webhook` // Rota para o Webhook
+    };
+
+    const mpResponse = await fetch("https://api.mercadopago.com/checkout/preferences", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${MERCADOPAGO_ACCESS_TOKEN}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(preferencePayload)
+    });
+
+    const mpData = await mpResponse.json();
+
+    if (!mpResponse.ok) {
+      console.error("[Mercado Pago] Erro ao criar preferência:", mpData);
+      return new Response(JSON.stringify({
+        error: "Erro ao inicializar pagamento."
+      }), { status: 502, headers: CORS_HEADERS });
+    }
+
+    // 9. Limpa o carrinho do usuário no banco
     await supabase.from("cart_items").delete().eq("user_id", user.id);
 
-    // 11. Retorna sucesso ao frontend
+    // 10. Retorna sucesso ao frontend com o ID da Preferência
     return new Response(JSON.stringify({
       success: true,
       pedidoId:         novoPedido.id,
-      lalamoveOrderId,
+      preferenceId:     mpData.id,
       scheduleAt:       scheduleAtISO,
       prazoEmDiasUteis,
       precoFrete,
-      shareLink,
     }), { status: 200, headers: CORS_HEADERS });
 
   } catch (err) {
