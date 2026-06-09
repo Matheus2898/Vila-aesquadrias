@@ -832,13 +832,31 @@ export default function ProductDetail() {
               <span style={{ fontSize: '14px', color: '#000', fontWeight: 600 }}>Frete grátis acima de duas unidades</span>
             </div>
 
-            <a
-              href={`https://wa.me/5511934194417?text=${encodeURIComponent(`Olá, tenho interesse no produto ${product.name} (SKU Base: ${product.sku_base || 'N/A'}). \n\nTamanho: ${selectedSize}\nCor do Perfil: ${currentColorName}\nVidro: ${buyWithGlass ? `${selectedGlassType} ${selectedGlassThickness} ${selectedGlassColor}` : 'Sem Vidro'}\nQuantidade: ${quantity}\nValor aproximado: R$ ${Number(displayPrice).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)}`}
-              target="_blank"
-              rel="noreferrer"
-              className="btn-ds btn-primary"
+            {/* ─── BOTÃO COMPRAR AGORA (Checkout Mercado Pago) ─── */}
+            <button
+              onClick={() => {
+                const prazoBase = product?.prazo_base ?? 5;
+                const diasExtras = product?.dias_extras_por_unidade ?? 1;
+                addToCart({
+                  product_id: product.id,
+                  name: product.name,
+                  price: displayPrice,
+                  quantity,
+                  image: galleryImages[0],
+                  prazo_base: prazoBase,
+                  dias_extras_por_unidade: diasExtras,
+                  options: {
+                    size: selectedSize,
+                    color: currentColorName,
+                    variant_sku: product.sku_base,
+                  }
+                });
+                window.location.href = '/carrinho';
+              }}
+              className="btn-ds"
               style={{
                 width: '100%',
+                marginBottom: '12px',
                 padding: window.innerWidth <= 768 ? '16px 0' : '20px 0',
                 fontSize: window.innerWidth <= 768 ? '16px' : '18px',
                 fontWeight: 900,
@@ -852,13 +870,40 @@ export default function ProductDetail() {
                 gap: '12px',
                 transition: 'all 0.2s',
                 cursor: 'pointer',
-                textDecoration: 'none',
-                background: '#25D366',
+                background: 'var(--color-navy-900)',
                 color: 'white'
               }}
+              onMouseOver={e => { e.currentTarget.style.opacity = '0.85'; }}
+              onMouseOut={e => { e.currentTarget.style.opacity = '1'; }}
             >
-              <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="css-i6dzq1"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg> 
-              Comprar pelo WhatsApp
+              <CreditCard size={22} />
+              Comprar Agora
+            </button>
+
+            <a
+              href={`https://wa.me/5511934194417?text=${encodeURIComponent(`Olá, tenho interesse no produto ${product.name} (SKU Base: ${product.sku_base || 'N/A'}). \n\nTamanho: ${selectedSize}\nCor do Perfil: ${currentColorName}\nVidro: ${buyWithGlass ? `${selectedGlassType} ${selectedGlassThickness} ${selectedGlassColor}` : 'Sem Vidro'}\nQuantidade: ${quantity}\nValor aproximado: R$ ${Number(displayPrice).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`)}`}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                width: '100%',
+                padding: window.innerWidth <= 768 ? '14px 0' : '16px 0',
+                fontSize: window.innerWidth <= 768 ? '14px' : '16px',
+                fontWeight: 700,
+                borderRadius: '999px',
+                border: '2px solid #25D366',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '12px',
+                transition: 'all 0.2s',
+                cursor: 'pointer',
+                textDecoration: 'none',
+                background: 'transparent',
+                color: '#25D366'
+              }}
+            >
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+              Orçar pelo WhatsApp
             </a>
 
             <div style={{ textAlign: 'center', marginTop: '16px', fontSize: '12px', color: '#888', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', width: '100%' }}>
