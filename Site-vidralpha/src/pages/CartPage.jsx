@@ -281,20 +281,65 @@ export default function CartPage() {
                             </div>
 
                             <div style={{ padding: '16px 0', borderTop: '1px solid #E2E8F0', borderBottom: '1px solid #E2E8F0' }}>
-                                <div style={{ fontSize: '14px', fontWeight: 700, color: '#1E293B', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <Truck size={18} /> Simular Entrega
+
+                                {/* ─── Banner "Calcule o frete para continuar" ─── */}
+                                {!selectedFreight && (
+                                    <div style={{
+                                        background: 'linear-gradient(135deg, #FFF7ED, #FFFBEB)',
+                                        border: '1.5px dashed #F59E0B',
+                                        borderRadius: '10px',
+                                        padding: '12px 14px',
+                                        marginBottom: '14px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '10px'
+                                    }}>
+                                        <Truck size={20} color="#D97706" style={{ flexShrink: 0 }} />
+                                        <div>
+                                            <p style={{ margin: 0, fontSize: '13px', fontWeight: 800, color: '#92400E' }}>
+                                                ⚠️ Calcule o frete para continuar
+                                            </p>
+                                            <p style={{ margin: '2px 0 0', fontSize: '11px', color: '#B45309' }}>
+                                                Insira seu CEP abaixo e clique em Calcular
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {selectedFreight && (
+                                    <div style={{
+                                        background: 'linear-gradient(135deg, #F0FDF4, #DCFCE7)',
+                                        border: '1.5px solid #22C55E',
+                                        borderRadius: '10px',
+                                        padding: '10px 14px',
+                                        marginBottom: '14px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '10px'
+                                    }}>
+                                        <ShieldCheck size={18} color="#16A34A" style={{ flexShrink: 0 }} />
+                                        <p style={{ margin: 0, fontSize: '13px', fontWeight: 700, color: '#15803D' }}>
+                                            ✅ Frete selecionado! Clique em Finalizar Compra.
+                                        </p>
+                                    </div>
+                                )}
+
+                                <div style={{ fontSize: '13px', fontWeight: 700, color: '#1E293B', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <Truck size={16} /> Digite seu CEP
                                 </div>
 
                                 <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
                                     <input
                                         type="text"
-                                        placeholder="Seu CEP"
+                                        placeholder="Seu CEP (apenas números)"
                                         maxLength={8}
                                         value={cep}
                                         onChange={e => setCep(e.target.value.replace(/\D/g, ''))}
                                         style={{
                                             flex: 1, padding: '10px 12px', borderRadius: '8px',
-                                            border: '1px solid #E2E8F0', fontSize: '14px', outline: 'none'
+                                            border: !selectedFreight && cep.length === 0 ? '2px solid #F59E0B' : '1px solid #E2E8F0',
+                                            fontSize: '14px', outline: 'none',
+                                            transition: 'border 0.3s'
                                         }}
                                     />
                                     <button
