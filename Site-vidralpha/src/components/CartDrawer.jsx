@@ -195,7 +195,7 @@ export default function CartDrawer() {
               <span style={{ fontSize: '18px', fontWeight: 900, color: '#000' }}>R$ {fmt(totalPrice)}</span>
             </div>
             <Link
-              to="/checkout"
+              to="/carrinho"
               onClick={() => setIsOpen(false)}
               style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
