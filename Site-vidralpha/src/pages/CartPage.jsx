@@ -78,19 +78,29 @@ export default function CartPage() {
                 body: {
                     itens: items,
                     enderecoEntrega: {
-                        lat: "-23.5505", // Pode ser melhorado depois com Geocoding real
+                        lat: "-23.5505",
                         lng: "-46.6333",
-                        address: cep
-                    }
+                        address: `CEP ${cep}`,
+                        cep: cep,
+                    },
+                    // Envia o frete já selecionado pelo usuário
+                    freteInfo: {
+                        vehicle: selectedFreight.vehicle,
+                        price: selectedFreight.price,
+                        time: selectedFreight.time,
+                        quotationId: selectedFreight.quotationId,
+                    },
                 }
             });
 
             if (error) throw error;
-            if (data.error) throw new Error(data.error);
+            if (data?.error) throw new Error(data.error);
 
             if (data && data.preferenceId) {
-                // Redireciona para o Mercado Pago Checkout Pro
-                window.location.href = `https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=${data.preferenceId}`;
+                // Usa a URL de init_point retornada pelo backend (produção ou sandbox)
+                const paymentUrl = data.checkoutUrl || data.sandboxUrl ||
+                    `https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=${data.preferenceId}`;
+                window.location.href = paymentUrl;
             } else {
                 throw new Error("Não foi possível gerar o pagamento.");
             }
