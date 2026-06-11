@@ -4,7 +4,7 @@ import {
     Loader2, Package, Filter, Clock, CheckCircle2, Truck,
     ChevronRight, AlertTriangle, RefreshCw, Search,
     CalendarClock, Hash, User, ShoppingCart, Hammer, CircleCheck,
-    X, Info
+    X, Info, Trash2
 } from 'lucide-react'
 import CustomDropdown from '../components/CustomDropdown'
 import toast from 'react-hot-toast'
@@ -80,7 +80,7 @@ function ColetaBadge({ scheduleAt }) {
 
 // ─── Modal de Detalhes do Pedido ──────────────────────────────────────────────
 
-function OrderDetailModal({ order, onClose, onStatusChange }) {
+function OrderDetailModal({ order, onClose, onStatusChange, onDeleteOrder }) {
     const [isSaving, setIsSaving] = useState(false)
     const [showAnticipatePrompt, setShowAnticipatePrompt] = useState(false)
 
@@ -285,10 +285,22 @@ function OrderDetailModal({ order, onClose, onStatusChange }) {
                 {!showAnticipatePrompt && (
                     <div style={{
                         padding: '20px 32px', borderTop: '1px solid #F1F5F9', flexShrink: 0,
-                        display: 'flex', gap: '12px', justifyContent: 'flex-end', background: '#FAFAFA',
+                        display: 'flex', gap: '12px', justifyContent: 'space-between', background: '#FAFAFA',
                         borderBottomLeftRadius: '24px', borderBottomRightRadius: '24px'
                     }}>
-                        {order.status_producao !== 'Em Produção' && order.status_producao !== 'Concluída' && (
+                        <button
+                            onClick={() => onDeleteOrder(order.id)}
+                            style={{
+                                padding: '12px 20px', background: '#FEF2F2', color: '#B91C1C',
+                                border: '1px solid #FECACA', borderRadius: '12px', fontWeight: 700,
+                                fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px'
+                            }}
+                        >
+                            <Trash2 size={15} /> Excluir
+                        </button>
+                        
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                            {order.status_producao !== 'Em Produção' && order.status_producao !== 'Concluída' && (
                             <button
                                 onClick={() => onStatusChange(order.id, 'Em Produção', false).then(onClose)}
                                 style={{
@@ -316,6 +328,7 @@ function OrderDetailModal({ order, onClose, onStatusChange }) {
                                 Produção Concluída
                             </button>
                         )}
+                        </div>
                     </div>
                 )}
             </div>
@@ -330,6 +343,18 @@ export default function AdminOrders() {
     const [search, setSearch] = useState('')
     const [selectedOrder, setSelectedOrder] = useState(null)
     const [refreshing, setRefreshing] = useState(false)
+
+    const handleDeleteOrder = async (orderId) => {
+        if (!window.confirm('Atenção: Excluir este pedido é uma ação irreversível. Deseja continuar?')) return;
+        const { error } = await supabase.from('orders').delete().eq('id', orderId)
+        if (error) {
+            toast.error('Erro ao excluir pedido: ' + error.message)
+        } else {
+            toast.success('Pedido excluído com sucesso!')
+            setOrders(prev => prev.filter(o => o.id !== orderId))
+            setSelectedOrder(null)
+        }
+    }
 
     const fetchOrders = useCallback(async (silent = false) => {
         if (!silent) setLoading(true)
@@ -664,6 +689,7 @@ export default function AdminOrders() {
                     order={selectedOrder}
                     onClose={() => setSelectedOrder(null)}
                     onStatusChange={handleStatusChange}
+                    onDeleteOrder={handleDeleteOrder}
                 />
             )}
         </div>
