@@ -83,6 +83,7 @@ function ColetaBadge({ scheduleAt }) {
 function OrderDetailModal({ order, onClose, onStatusChange, onDeleteOrder }) {
     const [isSaving, setIsSaving] = useState(false)
     const [showAnticipatePrompt, setShowAnticipatePrompt] = useState(false)
+    const [showDeletePrompt, setShowDeletePrompt] = useState(false)
 
     if (!order) return null
 
@@ -280,16 +281,59 @@ function OrderDetailModal({ order, onClose, onStatusChange, onDeleteOrder }) {
                             </div>
                         </div>
                     )}
+
+                    {showDeletePrompt && (
+                        <div style={{
+                            background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: '16px', padding: '18px 20px', marginTop: '16px'
+                        }}>
+                            <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', marginBottom: '14px' }}>
+                                <Trash2 size={18} color="#B91C1C" style={{ flexShrink: 0, marginTop: '2px' }} />
+                                <div>
+                                    <div style={{ fontWeight: 700, fontSize: '14px', color: '#991B1B' }}>Excluir Pedido Permanentemente</div>
+                                    <div style={{ fontSize: '13px', color: '#991B1B', marginTop: '4px' }}>
+                                        Atenção: Esta ação é irreversível e excluirá o pedido de toda a base de dados. Deseja continuar?
+                                    </div>
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                                <button
+                                    onClick={() => setShowDeletePrompt(false)}
+                                    disabled={isSaving}
+                                    style={{
+                                        flex: 1, padding: '10px', background: 'white', border: '1px solid #FECACA',
+                                        color: '#991B1B', borderRadius: '10px', fontWeight: 600, fontSize: '13px', cursor: 'pointer'
+                                    }}
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setIsSaving(true);
+                                        onDeleteOrder(order.id).finally(() => setIsSaving(false));
+                                    }}
+                                    disabled={isSaving}
+                                    style={{
+                                        flex: 1, padding: '10px', background: '#DC2626', border: 'none',
+                                        color: 'white', borderRadius: '10px', fontWeight: 700, fontSize: '13px',
+                                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
+                                    }}
+                                >
+                                    {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                                    Sim, excluir agora
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
-                {!showAnticipatePrompt && (
+                {!showAnticipatePrompt && !showDeletePrompt && (
                     <div style={{
                         padding: '20px 32px', borderTop: '1px solid #F1F5F9', flexShrink: 0,
                         display: 'flex', gap: '12px', justifyContent: 'space-between', background: '#FAFAFA',
                         borderBottomLeftRadius: '24px', borderBottomRightRadius: '24px'
                     }}>
                         <button
-                            onClick={() => onDeleteOrder(order.id)}
+                            onClick={() => setShowDeletePrompt(true)}
                             style={{
                                 padding: '12px 20px', background: '#FEF2F2', color: '#B91C1C',
                                 border: '1px solid #FECACA', borderRadius: '12px', fontWeight: 700,
@@ -345,7 +389,6 @@ export default function AdminOrders() {
     const [refreshing, setRefreshing] = useState(false)
 
     const handleDeleteOrder = async (orderId) => {
-        if (!window.confirm('Atenção: Excluir este pedido é uma ação irreversível. Deseja continuar?')) return;
         const { error } = await supabase.from('orders').delete().eq('id', orderId)
         if (error) {
             toast.error('Erro ao excluir pedido: ' + error.message)

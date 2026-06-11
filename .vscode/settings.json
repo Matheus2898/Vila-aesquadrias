@@ -1,3 +1,4 @@
 {
-    "geminicodeassist.outlines.automaticOutlineGeneration": false
+    "geminicodeassist.outlines.automaticOutlineGeneration": false,
+    "deno.enable": true
 }
