@@ -104,7 +104,7 @@ function RelatorioModal({ onClose }) {
         const key = `${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`
         if (!byMonth[key]) byMonth[key] = { mes: key, pedidos: 0, faturamento: 0, ticket_medio: 0 }
         byMonth[key].pedidos += 1
-        byMonth[key].faturamento += Number(o.total || 0)
+        byMonth[key].faturamento += Number(o.total || o.total_price || 0)
       })
       Object.values(byMonth).forEach(m => {
         m.ticket_medio = m.pedidos > 0 ? m.faturamento / m.pedidos : 0
@@ -126,7 +126,7 @@ function RelatorioModal({ onClose }) {
         'Cliente': typeof o.guest_name === 'string' && o.guest_name ? o.guest_name : 'Visitante',
         'E-mail': typeof o.guest_email === 'string' && o.guest_email ? o.guest_email : '-',
         'Status': statusLabel[o.status] || o.status,
-        'Valor (R$)': Number(o.total || 0).toFixed(2),
+        'Valor (R$)': Number(o.total || o.total_price || 0).toFixed(2),
         'Data': new Date(o.created_at).toLocaleDateString('pt-BR'),
         'Hora': new Date(o.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
       }))
@@ -319,7 +319,7 @@ function ExtratoModal({ onClose, onApplyMonth }) {
 
       if (error) throw error
 
-      const revenue = (data || []).reduce((acc, o) => acc + Number(o.total || 0), 0)
+      const revenue = (data || []).reduce((acc, o) => acc + Number(o.total || o.total_price || 0), 0)
       const delivered = (data || []).filter(o => o.status === 'delivered').length
       setOrders(data || [])
       setTotals({ count: data?.length || 0, revenue, delivered })
@@ -353,7 +353,7 @@ function ExtratoModal({ onClose, onApplyMonth }) {
         <td>#${String(o.id).slice(-6).toUpperCase()}</td>
         <td>${o.guest_name || 'Visitante'}</td>
         <td><span class="status status-${o.status}">${statusLabel[o.status] || o.status}</span></td>
-        <td class="value">${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(o.total || 0)}</td>
+        <td class="value">${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(o.total || o.total_price || 0)}</td>
         <td>${new Date(o.created_at).toLocaleDateString('pt-BR')}</td>
       </tr>
     `).join('')
@@ -558,7 +558,7 @@ function ExtratoModal({ onClose, onApplyMonth }) {
                                   color: o.status === 'confirmed' ? '#10B981' : o.status === 'pending' ? '#D97706' : '#64748B'
                                 }}>{statusLabel[o.status] || o.status}</span>
                               </td>
-                              <td style={{ padding: '7px 10px', textAlign: 'right', fontWeight: 700, color: '#1E293B' }}>{fmtCurrency(o.total)}</td>
+                              <td style={{ padding: '7px 10px', textAlign: 'right', fontWeight: 700, color: '#1E293B' }}>{fmtCurrency(o.total || o.total_price || 0)}</td>
                             </tr>
                           ))}
                           {orders.length > 8 && (
@@ -664,13 +664,13 @@ export default function AdminDashboard() {
       }
 
       // 1. Faturamento e pedidos do período selecionado
-      let query = supabase.from('orders').select('total, created_at').gte('created_at', firstDayMonth)
+      let query = supabase.from('orders').select('total, total_price, created_at').gte('created_at', firstDayMonth)
       if (lastDayMonth) query = query.lte('created_at', lastDayMonth)
       const { data: monthOrders, error: errO } = await query
 
       let revMonth = 0, countMonth = 0
       if (!errO && monthOrders) {
-        revMonth = monthOrders.reduce((acc, curr) => acc + Number(curr.total || 0), 0)
+        revMonth = monthOrders.reduce((acc, curr) => acc + Number(curr.total || curr.total_price || 0), 0)
         countMonth = monthOrders.length
       }
 
@@ -680,11 +680,11 @@ export default function AdminDashboard() {
         .select('*', { count: 'exact', head: true })
 
       // 3. Pedidos entregues (período selecionado)
-      let queryD = supabase.from('orders').select('total').eq('status', 'delivered').gte('created_at', firstDayMonth)
+      let queryD = supabase.from('orders').select('total, total_price').eq('status', 'delivered').gte('created_at', firstDayMonth)
       if (lastDayMonth) queryD = queryD.lte('created_at', lastDayMonth)
       const { data: deliveredOrders } = await queryD
 
-      const revDelivered = (deliveredOrders || []).reduce((acc, curr) => acc + Number(curr.total || 0), 0)
+      const revDelivered = (deliveredOrders || []).reduce((acc, curr) => acc + Number(curr.total || curr.total_price || 0), 0)
       const countDelivered = deliveredOrders?.length || 0
 
       // 4. Pedidos recentes (sempre os últimos 5, independente do filtro)
@@ -909,7 +909,7 @@ export default function AdminDashboard() {
                           {statusLabel[order.status] || order.status}
                         </span>
                       </td>
-                      <td style={{ padding: '16px', fontSize: '13px', fontWeight: 800, color: '#1E293B' }}>{maskValue(fmtCurrency(order.total))}</td>
+                      <td style={{ padding: '16px', fontSize: '13px', fontWeight: 800, color: '#1E293B' }}>{maskValue(fmtCurrency(order.total || order.total_price || 0))}</td>
                       <td style={{ padding: '16px', fontSize: '12px', color: '#64748B', textAlign: 'right' }}>{new Date(order.created_at).toLocaleDateString('pt-BR')}</td>
                     </tr>
                   ))

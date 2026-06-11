@@ -97,8 +97,8 @@ serve(async (req: Request) => {
             return new Response("Order not found", { status: 200 });
         }
 
-        // Se já foi processado ou confirmado, ignora
-        if (order.status !== "pending_payment") {
+        // Se já foi processado com entrega Lalamove, ignora
+        if (order.lalamove_order_id) {
             return new Response("Order already processed", { status: 200 });
         }
 
@@ -112,19 +112,30 @@ serve(async (req: Request) => {
                 // Precisamos buscar os dados do usuário para preencher o recipient
                 const { data: userData } = await supabase.auth.admin.getUserById(order.user_id);
                 
+                // Formatar telefones (Lalamove exige formato +5511999999999 sem espaços/parênteses)
+                const rawRecipientPhone = order.delivery_address?.phone || "+5511999999999";
+                const recipientPhone = rawRecipientPhone.startsWith('+') 
+                    ? '+' + rawRecipientPhone.replace(/\D/g, '') 
+                    : '+55' + rawRecipientPhone.replace(/\D/g, '');
+
+                const rawSenderPhone = Deno.env.get("LALAMOVE_SENDER_PHONE") || "+5511999999999";
+                const senderPhone = rawSenderPhone.startsWith('+') 
+                    ? '+' + rawSenderPhone.replace(/\D/g, '') 
+                    : '+55' + rawSenderPhone.replace(/\D/g, '');
+
                 const payloadPedido = {
                     data: {
                         quotationId: order.lalamove_quotation_id,
                         sender: {
                             stopIndex: "0",
                             name: "Vidralpha Fábrica",
-                            phone: Deno.env.get("LALAMOVE_SENDER_PHONE") ?? "+5511999999999",
+                            phone: senderPhone,
                         },
                         recipients: [
                             {
                                 stopIndex: "1",
                                 name: userData?.user?.user_metadata?.full_name || "Cliente",
-                                phone: order.delivery_address?.phone ?? "+5511999999999",
+                                phone: recipientPhone,
                             },
                         ],
                         isRecipientSMSEnabled: true,

@@ -26,6 +26,14 @@ const CORS_HEADERS = {
   "Content-Type": "application/json",
 };
 
+// Resposta de erro que SEMPRE retorna 200 para o cliente ver a mensagem real
+function errResponse(msg: string) {
+  console.error("[checkout-error]", msg);
+  return new Response(JSON.stringify({ error: msg }), {
+    status: 200, headers: CORS_HEADERS,
+  });
+}
+
 // ─── HELPER: Adiciona N dias úteis a uma data ─────────────────────────────────
 function adicionarDiasUteis(dataInicio: Date, dias: number): Date {
   const data = new Date(dataInicio.getTime());
@@ -54,7 +62,7 @@ function calcularPrazoFinal(itensPedido: Array<{
   return Math.max(...prazos);
 }
 
-// ─── HELPER: Assinatura Lalamove (usada pelo webhook de Place Order) ──────────
+// ─── HELPER: Assinatura Lalamove ──────────────────────────────────────────────
 async function gerarAssinaturaLalamove(metodo: string, caminho: string, timestamp: string, corpo: string): Promise<string> {
   const msg = `${timestamp}\r\n${metodo}\r\n${caminho}\r\n\r\n${corpo}`;
   const chave = await crypto.subtle.importKey(
@@ -67,109 +75,141 @@ async function gerarAssinaturaLalamove(metodo: string, caminho: string, timestam
 
 // ─── HANDLER PRINCIPAL ────────────────────────────────────────────────────────
 serve(async (req: Request) => {
-  // Preflight CORS
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: CORS_HEADERS });
   }
 
   try {
-    // 1. Autenticação do usuário via JWT do Supabase
+    // 1. Autenticação
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Não autenticado" }), {
-        status: 401, headers: CORS_HEADERS,
-      });
-    }
+    if (!authHeader) return errResponse("ERRO: Sem header de autenticação. Faça login novamente.");
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
     const token    = authHeader.replace("Bearer ", "");
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Token inválido" }), {
-        status: 401, headers: CORS_HEADERS,
-      });
+      return errResponse(`ERRO AUTH: ${authError?.message ?? "Token inválido"}`);
     }
 
-    // 2. Parse do corpo da requisição
-    // itens: [{ product_id, prazo_base, dias_extras_por_unidade, quantity, price, name }]
-    // enderecoEntrega: { lat, lng, address, cep }
-    // freteInfo: { vehicle, price, time } — frete já selecionado pelo usuário
-    const { itens, enderecoEntrega, freteInfo } = await req.json();
+    console.log(`[Checkout] Usuário: ${user.email}`);
+
+    // 2. Parse do corpo
+    const { itens, freteInfo, couponCode } = await req.json();
 
     if (!itens || !Array.isArray(itens) || itens.length === 0) {
-      return new Response(JSON.stringify({ error: "Carrinho vazio" }), {
-        status: 400, headers: CORS_HEADERS,
-      });
+      return errResponse("ERRO: Carrinho vazio");
     }
 
-    // 3. Calcula o prazo em dias úteis baseado nos produtos
-    const prazoEmDiasUteis = calcularPrazoFinal(itens);
-    console.log(`[Checkout] Prazo calculado: ${prazoEmDiasUteis} dias úteis`);
+    // 2.5 Buscar o endereço selecionado do usuário
+    const { data: profile } = await supabase.from('profiles').select('address_json').eq('id', user.id).single();
+    const addressData = profile?.address_json;
+    const selectedAddress = addressData?.addresses?.find((a: any) => a.id === addressData?.selected_id) 
+                            || addressData?.addresses?.[0];
 
-    // 4. Calcula a data de coleta
+    if (!selectedAddress) {
+      return errResponse("ERRO: Nenhum endereço de entrega cadastrado no seu perfil. Por favor, adicione um endereço.");
+    }
+    if (!selectedAddress.phone) {
+      return errResponse("ERRO: O endereço selecionado não tem um telefone cadastrado. O telefone é obrigatório para a entrega Lalamove.");
+    }
+
+    // 3. Verifica MERCADOPAGO_ACCESS_TOKEN PRIMEIRO (antes de salvar no banco)
+    if (!MERCADOPAGO_ACCESS_TOKEN) {
+      return errResponse("ERRO CONFIG: MERCADOPAGO_ACCESS_TOKEN não está configurado nos Secrets do Supabase. Vá em Settings > Edge Functions > Secrets.");
+    }
+
+    // 4. Calcula prazo e data de coleta
+    const prazoEmDiasUteis = calcularPrazoFinal(itens);
     const agora = new Date();
     const dataColeta = adicionarDiasUteis(agora, prazoEmDiasUteis);
     dataColeta.setUTCHours(12, 0, 0, 0);
     const scheduleAtISO = dataColeta.toISOString();
 
-    // 5. Preço do frete (já calculado pelo frontend via lalamove-quote)
+    // 5. Valores do frete
     const precoFrete = freteInfo?.price ? Number(freteInfo.price) : 0;
     const veiculoFrete = freteInfo?.vehicle ?? "Padrão";
     const lalamoveQuotationId = freteInfo?.quotationId ?? null;
 
-    console.log(`[Checkout] Frete selecionado: ${veiculoFrete} = R$${precoFrete}, Quotation: ${lalamoveQuotationId}`);
+    console.log(`[Checkout] Frete: ${veiculoFrete} = R$${precoFrete}`);
 
-    // 6. Salva o pedido na tabela `orders` com status pending_payment
+    // 6. Salva o pedido no banco
     const totalProdutos = itens.reduce((soma: number, item: { price: number; quantity: number }) =>
       soma + (item.price * item.quantity), 0
     );
 
+    let discountValue = 0;
+    if (couponCode) {
+      const { data: coupon, error: couponError } = await supabase
+        .from('coupons')
+        .select('*')
+        .eq('code', couponCode.toUpperCase())
+        .single();
+      
+      if (!couponError && coupon && coupon.is_active) {
+        if (!coupon.usage_limit || coupon.used_count < coupon.usage_limit) {
+          if (!coupon.expires_at || new Date(coupon.expires_at) >= new Date()) {
+            if (coupon.type === 'percentage') {
+              discountValue = totalProdutos * (coupon.value / 100);
+            } else {
+              discountValue = coupon.value;
+            }
+            if (discountValue > totalProdutos) discountValue = totalProdutos;
+            
+            // Incrementa o uso do cupom
+            await supabase.from('coupons').update({ used_count: (coupon.used_count || 0) + 1 }).eq('id', coupon.id);
+          }
+        }
+      }
+    }
+
     const { data: novoPedido, error: dbError } = await supabase
       .from("orders")
       .insert({
-        user_id:          user.id,
-        items:            itens,
-        total_price:      totalProdutos + precoFrete,
-        freight_price:    precoFrete,
-        freight_vehicle:  veiculoFrete,
-        status:           "pending_payment",
-        status_producao:  "Pendente",
-        schedule_at:      scheduleAtISO,
-        delivery_address: enderecoEntrega,
-        prazo_dias_uteis: prazoEmDiasUteis,
+        user_id:               user.id,
+        items:                 itens,
+        total_price:           totalProdutos - discountValue + precoFrete,
+        freight_price:         precoFrete,
+        status:                "pending",
+        status_producao:       "Pendente",
+        schedule_at:           scheduleAtISO,
+        delivery_address:      selectedAddress, // Endereço completo puxado do perfil do cliente
+        prazo_dias_uteis:      prazoEmDiasUteis,
         lalamove_quotation_id: lalamoveQuotationId,
       })
       .select()
       .single();
 
     if (dbError) {
-      console.error("[DB] Erro ao salvar pedido:", dbError);
-      return new Response(JSON.stringify({
-        error: "Erro ao criar pedido no banco de dados.",
-      }), { status: 500, headers: CORS_HEADERS });
+      return errResponse(`ERRO DB: ${dbError.message} | code: ${dbError.code} | hint: ${dbError.hint} | details: ${dbError.details}`);
     }
 
     console.log(`[Checkout] Pedido criado: ${novoPedido.id}`);
 
-    // 7. Verifica se tem token do Mercado Pago
-    if (!MERCADOPAGO_ACCESS_TOKEN) {
-      console.error("[Checkout] MERCADOPAGO_ACCESS_TOKEN não configurado!");
-      return new Response(JSON.stringify({
-        error: "Pagamento não configurado. Contate o suporte.",
-      }), { status: 500, headers: CORS_HEADERS });
-    }
-
-    // 8. Cria a Preferência no Mercado Pago
+    // 7. Cria Preferência no Mercado Pago
     const origin = req.headers.get("origin") ?? "https://vilacaesquadrias.com.br";
 
-    const mpItems = itens.map((item: any) => ({
+    let mpItems = itens.map((item: any) => ({
       id: String(item.product_id),
-      title: item.name || "Produto Vidralpha",
+      title: item.name || "Produto Vilaça Esquadrias",
       quantity: Number(item.quantity),
       unit_price: Number(item.price),
       currency_id: "BRL",
     }));
+
+    if (discountValue > 0) {
+      const remainingPrice = totalProdutos - discountValue;
+      mpItems = [];
+      if (remainingPrice > 0) {
+        mpItems.push({
+          id: "pedido_desconto",
+          title: "Pedido com Desconto Aplicado",
+          quantity: 1,
+          unit_price: Number(remainingPrice.toFixed(2)),
+          currency_id: "BRL",
+        });
+      }
+    }
 
     if (precoFrete > 0) {
       mpItems.push({
@@ -209,35 +249,28 @@ serve(async (req: Request) => {
     const mpData = await mpResponse.json();
 
     if (!mpResponse.ok) {
-      console.error("[Mercado Pago] Erro ao criar preferência:", JSON.stringify(mpData));
-      // Deleta o pedido criado para não deixar órfão
       await supabase.from("orders").delete().eq("id", novoPedido.id);
-      return new Response(JSON.stringify({
-        error: `Erro ao inicializar pagamento: ${mpData?.message ?? "Erro desconhecido"}`,
-      }), { status: 502, headers: CORS_HEADERS });
+      return errResponse(`ERRO MP (${mpResponse.status}): ${mpData?.message ?? JSON.stringify(mpData)}`);
     }
 
     console.log(`[Checkout] Preferência MP criada: ${mpData.id}`);
 
-    // 9. Limpa o carrinho do usuário
+    // 8. Limpa o carrinho
     await supabase.from("cart_items").delete().eq("user_id", user.id);
 
-    // 10. Retorna sucesso com o ID da preferência
+    // 9. Retorna sucesso
     return new Response(JSON.stringify({
       success: true,
       pedidoId:         novoPedido.id,
       preferenceId:     mpData.id,
-      checkoutUrl:      mpData.init_point,    // URL de pagamento (produção)
-      sandboxUrl:       mpData.sandbox_init_point, // URL sandbox
+      checkoutUrl:      mpData.init_point,
+      sandboxUrl:       mpData.sandbox_init_point,
       scheduleAt:       scheduleAtISO,
       prazoEmDiasUteis,
       precoFrete,
     }), { status: 200, headers: CORS_HEADERS });
 
   } catch (err) {
-    console.error("[lalamove-checkout] Erro inesperado:", err);
-    return new Response(JSON.stringify({ error: "Erro interno do servidor" }), {
-      status: 500, headers: CORS_HEADERS,
-    });
+    return errResponse(`ERRO INESPERADO: ${String(err)}`);
   }
 });

@@ -156,7 +156,7 @@ export default function AdminDetailedOrders() {
                                             <DollarSign size={16} color="#10B981" style={{ marginTop: '2px' }} />
                                             <div>
                                                 <span style={{ display: 'block', fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', color: '#94A3B8' }}>Valor do Contrato</span>
-                                                <span style={{ fontSize: '18px', fontWeight: 900, color: '#10B981' }}>{fmtCurrency(order.total)}</span>
+                                                <span style={{ fontSize: '18px', fontWeight: 900, color: '#10B981' }}>{fmtCurrency(order.total || order.total_price || 0)}</span>
                                             </div>
                                         </div>
                                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>

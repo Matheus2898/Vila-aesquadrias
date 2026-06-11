@@ -339,6 +339,7 @@ export default function AdminOrders() {
             let { data: ordersData, error: ordersError } = await supabase
                 .from('orders')
                 .select('*')
+                .neq('status', 'pending')
                 .order('created_at', { ascending: false })
 
             if (ordersError?.code === '42P01') {

@@ -8,7 +8,8 @@ import toast from 'react-hot-toast';
 export default function CartPage() {
     const { items, removeFromCart, updateQty, totalItems, totalPrice } = useCart();
     const [coupon, setCoupon] = useState('');
-
+    const [appliedCoupon, setAppliedCoupon] = useState(null);
+    const [couponLoading, setCouponLoading] = useState(false);
     const [cep, setCep] = useState('');
     const [freightLoading, setFreightLoading] = useState(false);
     const [freightResult, setFreightResult] = useState(null);
@@ -17,8 +18,19 @@ export default function CartPage() {
 
     const fmt = (v) => Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-    // Final Total with Freight
-    const cartTotalWithFreight = totalPrice + (selectedFreight?.price && selectedFreight.price !== '-' ? Number(selectedFreight.price) : 0);
+    const discountAmount = React.useMemo(() => {
+        if (!appliedCoupon) return 0;
+        let d = 0;
+        if (appliedCoupon.type === 'percentage') {
+            d = totalPrice * (appliedCoupon.value / 100);
+        } else {
+            d = appliedCoupon.value;
+        }
+        return d > totalPrice ? totalPrice : d;
+    }, [appliedCoupon, totalPrice]);
+
+    // Final Total with Freight and Discount
+    const cartTotalWithFreight = totalPrice - discountAmount + (selectedFreight?.price && selectedFreight.price !== '-' ? Number(selectedFreight.price) : 0);
 
     // Calculate Total Weight for Freight
     const totalWeight = items.reduce((acc, item) => {
@@ -26,6 +38,47 @@ export default function CartPage() {
         const weight = measure?.weight ? Number(measure.weight) : 0;
         return acc + (weight * item.quantity);
     }, 0);
+
+    async function handleApplyCoupon() {
+        if (!coupon) return;
+        setCouponLoading(true);
+        try {
+            const { data, error } = await supabase
+                .from('coupons')
+                .select('*')
+                .eq('code', coupon.toUpperCase())
+                .single();
+
+            if (error || !data) {
+                toast.error('Cupom inválido ou não encontrado.');
+                setAppliedCoupon(null);
+                return;
+            }
+
+            if (!data.is_active) {
+                toast.error('Este cupom está inativo.');
+                return;
+            }
+
+            if (data.usage_limit && data.used_count >= data.usage_limit) {
+                toast.error('Este cupom atingiu o limite de uso.');
+                return;
+            }
+
+            if (data.expires_at && new Date(data.expires_at) < new Date()) {
+                toast.error('Este cupom já expirou.');
+                return;
+            }
+
+            setAppliedCoupon(data);
+            toast.success('Cupom aplicado com sucesso!');
+        } catch (err) {
+            console.error(err);
+            toast.error('Erro ao aplicar cupom.');
+        } finally {
+            setCouponLoading(false);
+        }
+    }
 
     async function handleCalculateFreight() {
         if (cep.length !== 8) {
@@ -90,6 +143,7 @@ export default function CartPage() {
                         time: selectedFreight.time,
                         quotationId: selectedFreight.quotationId,
                     },
+                    couponCode: appliedCoupon?.code || null,
                 }
             });
 
@@ -255,21 +309,35 @@ export default function CartPage() {
                                         placeholder="Código do cupom"
                                         value={coupon}
                                         onChange={e => setCoupon(e.target.value)}
+                                        disabled={appliedCoupon !== null}
                                         style={{
                                             padding: '12px 16px 12px 42px', borderRadius: '10px',
                                             border: '1px solid #E2E8F0', fontSize: '14px', outline: 'none',
-                                            width: '180px'
+                                            width: '180px',
+                                            background: appliedCoupon ? '#F8FAFC' : 'white',
+                                            color: appliedCoupon ? '#94A3B8' : '#0F172A'
                                         }}
                                     />
                                 </div>
-                                <button className="btn-ds btn-primary" style={{
-                                    padding: '12px 24px', border: 'none',
-                                    borderRadius: '10px', fontSize: '13px', fontWeight: 800, textTransform: 'uppercase',
-                                    cursor: 'pointer', transition: 'all 0.2s',
-                                    boxShadow: '0 4px 12px rgba(26, 45, 161, 0.2)'
-                                }} onMouseOver={e => { e.target.style.transform = 'translateY(-1px)' }} onMouseOut={e => { e.target.style.transform = 'translateY(0)' }}>
-                                    Aplicar Cupom
-                                </button>
+                                {appliedCoupon ? (
+                                    <button onClick={() => { setAppliedCoupon(null); setCoupon(''); }} style={{
+                                        padding: '12px 24px', border: '1px solid #EF4444', background: 'white', color: '#EF4444',
+                                        borderRadius: '10px', fontSize: '13px', fontWeight: 800, textTransform: 'uppercase',
+                                        cursor: 'pointer', transition: 'all 0.2s',
+                                    }}>
+                                        Remover
+                                    </button>
+                                ) : (
+                                    <button onClick={handleApplyCoupon} disabled={couponLoading} className="btn-ds btn-primary" style={{
+                                        padding: '12px 24px', border: 'none',
+                                        borderRadius: '10px', fontSize: '13px', fontWeight: 800, textTransform: 'uppercase',
+                                        cursor: couponLoading ? 'not-allowed' : 'pointer', transition: 'all 0.2s',
+                                        boxShadow: '0 4px 12px rgba(26, 45, 161, 0.2)',
+                                        display: 'flex', alignItems: 'center', gap: '8px'
+                                    }} onMouseOver={e => { if(!couponLoading) e.target.style.transform = 'translateY(-1px)' }} onMouseOut={e => { if(!couponLoading) e.target.style.transform = 'translateY(0)' }}>
+                                        {couponLoading ? <Loader2 size={14} className="animate-spin" /> : 'Aplicar Cupom'}
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -289,6 +357,13 @@ export default function CartPage() {
                                 <span style={{ color: '#64748B' }}>Subtotal</span>
                                 <span style={{ fontWeight: 700, color: '#1E293B' }}>R$ {fmt(totalPrice)}</span>
                             </div>
+
+                            {discountAmount > 0 && (
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '15px', color: '#10B981' }}>
+                                    <span style={{ fontWeight: 600 }}>Desconto ({appliedCoupon?.code})</span>
+                                    <span style={{ fontWeight: 700 }}>- R$ {fmt(discountAmount)}</span>
+                                </div>
+                            )}
 
                             <div style={{ padding: '16px 0', borderTop: '1px solid #E2E8F0', borderBottom: '1px solid #E2E8F0' }}>
 
