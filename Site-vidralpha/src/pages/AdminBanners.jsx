@@ -15,6 +15,7 @@ export default function AdminBanners() {
   // Formulário Modal
   const [formData, setFormData] = useState({
     image_url: '',
+    image_mobile_url: '',
     badge_text: '',
     title_line1: '',
     title_highlight: '',
@@ -33,6 +34,10 @@ export default function AdminBanners() {
   const [imageFile, setImageFile] = useState(null)
   const [previewImage, setPreviewImage] = useState(null)
   const [isDragging, setIsDragging] = useState(false)
+
+  const [imageMobileFile, setImageMobileFile] = useState(null)
+  const [previewMobileImage, setPreviewMobileImage] = useState(null)
+  const [isDraggingMobile, setIsDraggingMobile] = useState(false)
 
 
 
@@ -61,6 +66,7 @@ export default function AdminBanners() {
   const handleOpenNew = () => {
     setFormData({
       image_url: '',
+      image_mobile_url: '',
       badge_text: '',
       title_line1: '',
       title_highlight: '',
@@ -78,12 +84,15 @@ export default function AdminBanners() {
     setEditingId(null)
     setImageFile(null)
     setPreviewImage(null)
+    setImageMobileFile(null)
+    setPreviewMobileImage(null)
     setIsModalOpen(true)
   }
 
   const handleOpenEdit = (banner) => {
     setFormData({
       image_url: banner.image_url || '',
+      image_mobile_url: banner.image_mobile_url || '',
       badge_text: banner.badge_text || '',
       title_line1: banner.title_line1 || '',
       title_highlight: banner.title_highlight || '',
@@ -101,6 +110,8 @@ export default function AdminBanners() {
     setEditingId(banner.id)
     setImageFile(null)
     setPreviewImage(banner.image_url)
+    setImageMobileFile(null)
+    setPreviewMobileImage(banner.image_mobile_url || null)
     setIsModalOpen(true)
   }
 
@@ -204,6 +215,30 @@ export default function AdminBanners() {
     }
   }
 
+  const handleDragOverMobile = (e) => {
+    e.preventDefault()
+    setIsDraggingMobile(true)
+  }
+
+  const handleDragLeaveMobile = (e) => {
+    e.preventDefault()
+    setIsDraggingMobile(false)
+  }
+
+  const handleDropMobile = (e) => {
+    e.preventDefault()
+    setIsDraggingMobile(false)
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0]
+      if (file.type.startsWith('image/')) {
+        setImageMobileFile(file)
+        setPreviewMobileImage(URL.createObjectURL(file))
+      } else {
+        toast.error('O arquivo precisa ser uma imagem.')
+      }
+    }
+  }
+
   const handleRemoveImage = (e) => {
     e.preventDefault()
     e.stopPropagation()
@@ -220,11 +255,28 @@ export default function AdminBanners() {
     }
   }
 
+  const handleRemoveMobileImage = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setImageMobileFile(null)
+    setPreviewMobileImage(null)
+    setFormData(prev => ({ ...prev, image_mobile_url: '' }))
+  }
+
+  const handleImageMobileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0]
+      setImageMobileFile(file)
+      setPreviewMobileImage(URL.createObjectURL(file))
+    }
+  }
+
   const handleSave = async (e) => {
     e.preventDefault()
     setIsSaving(true)
 
     let finalImageUrl = formData.image_url
+    let finalImageMobileUrl = formData.image_mobile_url || ''
 
     // Fazer upload de nova imagem se selecionada
     if (imageFile) {
@@ -248,6 +300,27 @@ export default function AdminBanners() {
       finalImageUrl = publicUrlData.publicUrl
     }
 
+    if (imageMobileFile) {
+      const fileExt = imageMobileFile.name.split('.').pop()
+      const fileName = `banner-mobile-${Date.now()}-${Math.random()}.${fileExt}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(fileName, imageMobileFile)
+
+      if (uploadError) {
+        toast.error('Erro no upload da imagem mobile: ' + uploadError.message)
+        setIsSaving(false)
+        return
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(fileName)
+
+      finalImageMobileUrl = publicUrlData.publicUrl
+    }
+
     if (!finalImageUrl) {
       toast.error('Uma imagem é obrigatória!')
       setIsSaving(false)
@@ -256,7 +329,8 @@ export default function AdminBanners() {
 
     const payload = {
       ...formData,
-      image_url: finalImageUrl
+      image_url: finalImageUrl,
+      image_mobile_url: finalImageMobileUrl
     }
 
     let error
@@ -420,6 +494,59 @@ export default function AdminBanners() {
                     <button
                       type="button"
                       onClick={handleRemoveImage}
+                      title="Excluir imagem selecionada"
+                      style={{
+                        position: 'absolute', top: '12px', right: '12px', zIndex: 10,
+                        background: 'rgba(255, 255, 255, 0.95)', color: '#EF4444',
+                        border: 'none', borderRadius: '50%', width: '32px', height: '32px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = '#EF4444'; e.currentTarget.style.color = 'white'; e.currentTarget.style.transform = 'scale(1.05)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)'; e.currentTarget.style.color = '#EF4444'; e.currentTarget.style.transform = 'none'; }}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div style={{ width: '100%' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', fontWeight: 600, fontSize: '13px', color: '#475569' }}>
+                  Imagem Mobile (Celular) <span style={{ fontSize: '11px', fontWeight: 400, color: '#94A3B8' }}>(Opcional)</span>
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <label
+                    onDragOver={handleDragOverMobile}
+                    onDragLeave={handleDragLeaveMobile}
+                    onDrop={handleDropMobile}
+                    style={{
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                      height: '180px', width: '100%',
+                      border: isDraggingMobile ? '2px dashed #3B82F6' : '2px dashed #CBD5E1',
+                      borderRadius: '16px', cursor: 'pointer',
+                      background: previewMobileImage ? `url("${previewMobileImage}") center/contain no-repeat` : (isDraggingMobile ? '#EFF6FF' : '#F8FAFC'),
+                      backgroundColor: previewMobileImage ? '#F1F5F9' : undefined,
+                      color: previewMobileImage ? 'white' : '#64748B',
+                      textShadow: previewMobileImage ? '0 2px 4px rgba(0,0,0,0.8)' : 'none',
+                      transition: 'all 0.2s', position: 'relative', overflow: 'hidden'
+                    }}
+                    onMouseEnter={e => { if (!previewMobileImage && !isDraggingMobile) { e.currentTarget.style.background = '#F1F5F9'; e.currentTarget.style.borderColor = '#94A3B8'; } }}
+                    onMouseLeave={e => { if (!previewMobileImage && !isDraggingMobile) { e.currentTarget.style.background = '#F8FAFC'; e.currentTarget.style.borderColor = '#CBD5E1'; } }}
+                  >
+                    {previewMobileImage && <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.2)' }} />}
+                    <ImageIcon size={isDraggingMobile ? 48 : 36} strokeWidth={1.5} style={{ marginBottom: '12px', opacity: previewMobileImage ? 1 : 0.6, position: 'relative', zIndex: 2, transition: 'all 0.2s', color: isDraggingMobile ? '#3B82F6' : undefined }} />
+                    <span style={{ fontSize: '14px', fontWeight: 600, position: 'relative', zIndex: 2, color: isDraggingMobile ? '#3B82F6' : undefined }}>
+                      {isDraggingMobile ? 'Solte a imagem aqui...' : (previewMobileImage ? 'Clique ou arraste para trocar' : 'Upload de imagem vertical para celulares')}
+                    </span>
+                    {!previewMobileImage && !isDraggingMobile && <span style={{ fontSize: '12px', color: '#94A3B8', marginTop: '6px', fontWeight: 500 }}>Recomendado: 1080x1920px (Tamanho de Stories)</span>}
+                    <input type="file" accept="image/*" onChange={handleImageMobileChange} style={{ display: 'none' }} />
+                  </label>
+
+                  {previewMobileImage && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveMobileImage}
                       title="Excluir imagem selecionada"
                       style={{
                         position: 'absolute', top: '12px', right: '12px', zIndex: 10,

@@ -156,9 +156,11 @@ export default function Home() {
               ta = 'center';
             }
 
+            const displayImageUrl = (isMobile && banner.image_mobile_url) ? banner.image_mobile_url : banner.image_url;
+
             return (
               <SwiperSlide key={banner.id}>
-                <div style={{ position: 'absolute', inset: 0, backgroundImage: `url("${banner.image_url}")`, backgroundSize: 'cover', backgroundPosition: banner.background_position || 'center' }}></div>
+                <div style={{ position: 'absolute', inset: 0, backgroundImage: `url("${displayImageUrl}")`, backgroundSize: 'cover', backgroundPosition: banner.background_position || 'center' }}></div>
 
                 {/* Fallback dark gradient is removed here so it doesn't darken the user's custom blue background */}
 
